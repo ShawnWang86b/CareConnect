@@ -18,7 +18,7 @@ const GoogleTextInput = ({
     >
       <GooglePlacesAutocomplete
         fetchDetails={true}
-        placeholder="Search"
+        placeholder={initialLocation!}
         debounce={200}
         styles={{
           textInputContainer: {
