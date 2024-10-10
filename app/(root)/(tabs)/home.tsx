@@ -125,7 +125,6 @@ const Home = () => {
   const [hasPermissions, setHasPermissions] = useState(false);
   const loading = true;
 
-  console.log(user);
   const handleSignOut = () => {
     signOut();
     router.replace("/(auth)/sign-in");
@@ -172,6 +171,7 @@ const Home = () => {
     <SafeAreaView className="bg-general-500">
       <FlatList
         data={recentRids?.slice(0, 5)}
+        //@ts-ignore
         renderItem={({ item }) => <RideCard ride={item} />}
         className="px-5"
         keyboardShouldPersistTaps="handled"
@@ -210,7 +210,7 @@ const Home = () => {
               </View>
             </>
             <Text className="text-xl font-JakartaBold mt-5 mb-3">
-              Recent Rides
+              Recent visit
             </Text>
           </>
         )}

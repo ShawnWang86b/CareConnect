@@ -48,3 +48,13 @@ export const useDriverStore = create<DriverStore>((set) => ({
   setDrivers: (drivers: MarkerData[]) => set(() => ({ drivers: drivers })),
   clearSelectedDriver: () => set(() => ({ selectedDriver: null })),
 }));
+
+export const useDateList = create<any>((set) => ({
+  dateList: [],
+  setDateList: (dateList: number) => set(() => ({ dateList })),
+
+  //TODO: not sure, use any and " " first
+  userSelectedDate: "",
+  setUserSelectedDate: (userSelectedDate: any) =>
+    set(() => ({ userSelectedDate })),
+}));
