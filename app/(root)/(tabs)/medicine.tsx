@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import DateList from "@/components/DateList";
 import { Ionicons } from "@expo/vector-icons";
 import {
@@ -16,7 +16,7 @@ import { useForm, Controller } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useUser } from "@clerk/clerk-expo";
-import { fetchAPI } from "@/lib/fetch";
+import { fetchAPI, useFetch } from "@/lib/fetch";
 import { useDateList } from "@/store";
 
 // Zod schema for form validation
@@ -37,6 +37,7 @@ const Medicine = () => {
   const [isTimePickerVisible, setTimePickerVisible] = useState(false);
   const { dateList, setDateList, userSelectedDate, setUserSelectedDate } =
     useDateList();
+
   const {
     control,
     handleSubmit,
@@ -50,6 +51,11 @@ const Medicine = () => {
       selectedTimes: [],
     },
   });
+
+  const { data, loading, error } = useFetch<any[]>(
+    `/(api)/(myMedicine)/${userId}/${userSelectedDate}`
+  );
+  console.log("data", data);
 
   // Handle time picker confirmation
   const handleConfirmTime = (time: Date) => {
@@ -86,6 +92,7 @@ const Medicine = () => {
         body: JSON.stringify({
           name: data.medicineName,
           description: data.description,
+          day: userSelectedDate,
           time: data.selectedTimes,
           user_id: userId,
         }),
@@ -118,8 +125,9 @@ const Medicine = () => {
         <DateList />
       </View>
       <View className="px-5">
-        <Text className="text-xl capitalize font-JakartaExtraBold">
-          Today's plan
+        <Text className="text-xl font-JakartaExtraBold">
+          {/* Today */}
+          {userSelectedDate}'s Plan
         </Text>
       </View>
 

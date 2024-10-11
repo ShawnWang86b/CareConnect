@@ -23,13 +23,22 @@ const DateList = () => {
   const [dateSelected, setDateSelected] = useState<Date>(
     dates.find((day) => day.isToday)?.date || new Date()
   );
-
+  // console.log("dateSelected", dateSelected);
   const { dateList, setDateList, userSelectedDate, setUserSelectedDate } =
     useDateList();
-
+  console.log("userSelectedDate", userSelectedDate);
   useEffect(() => {
     setDateList(dates);
   }, []);
+
+  useEffect(() => {
+    const formatDate = dateSelected
+      .toLocaleDateString()
+      .split("T")[0]
+      .split("/")
+      .join("-");
+    setUserSelectedDate(formatDate);
+  }, [dateSelected]);
 
   const handleDatePress = (date: Date) => {
     setDateSelected(date);
@@ -39,13 +48,13 @@ const DateList = () => {
     <FlatList
       data={dates}
       horizontal
-      keyExtractor={(item) => item.date.toISOString()}
+      keyExtractor={(item) => item.date.toLocaleDateString()}
       renderItem={({ item }) => (
         <TouchableOpacity
           onPress={() => handleDatePress(item.date)}
           className={`px-4 py-2 rounded-lg mx-2 border border-gray-300 ${
-            dateSelected?.toISOString().split("T")[0] ===
-            item.date.toISOString().split("T")[0]
+            dateSelected?.toLocaleDateString().split("T")[0] ===
+            item.date.toLocaleDateString().split("T")[0]
               ? "bg-sky-500"
               : "bg-white"
           }`}
