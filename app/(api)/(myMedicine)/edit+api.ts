@@ -29,7 +29,7 @@ export async function PUT(request: Request) {
 
     // Update the medicine for the logged-in user
     const response = await sql`
-      UPDATE myMedicine
+      UPDATE my_medicine
       SET name = ${name}, dosage = ${dosage}, description = ${description}
       WHERE id = ${medicineId} AND user_id = ${userId}
       RETURNING *;

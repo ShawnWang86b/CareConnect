@@ -1,24 +1,16 @@
 import { neon } from "@neondatabase/serverless";
-import { useUser } from "@clerk/clerk-expo"; // Import Clerk's user management
 
 export async function DELETE(request: Request) {
   try {
-    const { user } = useUser();
-
-    if (!user) {
-      return new Response(JSON.stringify({ error: "Unauthorized" }), {
-        status: 401,
-      });
-    }
-
-    const userId = user.id; // Clerk's user ID
     const sql = neon(`${process.env.DATABASE_URL}`);
 
-    const { medicineId } = await request.json(); // Expecting medicineId in the request body
+    const body = await request.json();
 
-    if (!medicineId) {
+    const { medicineId, user_id } = body;
+
+    if (!medicineId || !user_id) {
       return new Response(
-        JSON.stringify({ error: "Medicine ID is required" }),
+        JSON.stringify({ error: "Missing required fields" }),
         {
           status: 400,
         }
@@ -27,8 +19,8 @@ export async function DELETE(request: Request) {
 
     // Delete the medicine for the logged-in user
     const response = await sql`
-      DELETE FROM myMedicine
-      WHERE id = ${medicineId} AND user_id = ${userId}
+      DELETE FROM my_medicine
+      WHERE "id" = ${medicineId} AND "user_id" = ${user_id}
       RETURNING *;
     `;
 

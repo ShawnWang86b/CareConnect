@@ -8,6 +8,7 @@ import {
   Modal,
   TextInput,
   ScrollView,
+  FlatList,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import DateTimePickerModal from "react-native-modal-datetime-picker";
@@ -18,6 +19,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useUser } from "@clerk/clerk-expo";
 import { fetchAPI, useFetch } from "@/lib/fetch";
 import { useDateList } from "@/store";
+import MedicineCard from "@/components/MedicineCard";
 
 // Zod schema for form validation
 const schema = z.object({
@@ -52,6 +54,7 @@ const Medicine = () => {
     },
   });
 
+  // fetch data
   const { data, loading, error } = useFetch<any[]>(
     `/(api)/(myMedicine)/${userId}/${userSelectedDate}`
   );
@@ -106,7 +109,9 @@ const Medicine = () => {
   // Handle time picker visibility
   const showTimePicker = () => setTimePickerVisible(true);
   const hideTimePicker = () => setTimePickerVisible(false);
-
+  {
+    loading && <Text>Loading</Text>;
+  }
   return (
     <SafeAreaView>
       <View className="flex-row justify-between items-center px-5 mt-5">
@@ -258,6 +263,22 @@ const Medicine = () => {
           </View>
         </View>
       </Modal>
+
+      {data && data.length > 0 ? (
+        <FlatList
+          className="bg-white m-4 p-4"
+          data={data}
+          renderItem={({ item }) => (
+            <Text>
+              <MedicineCard item={item} />
+            </Text>
+          )}
+        />
+      ) : (
+        <Text className="px-5 mt-5 text-lg font-JakartaBold flex justify-center items-start">
+          No medicine plan today!
+        </Text>
+      )}
     </SafeAreaView>
   );
 };
