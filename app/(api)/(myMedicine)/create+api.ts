@@ -5,6 +5,7 @@ export async function POST(request: Request) {
     const sql = neon(`${process.env.DATABASE_URL}`);
 
     const body = await request.json();
+    console.log("body", body);
     const { name, description, day, time, user_id } = body; // Add your necessary medicine fields
 
     // Ensure all required fields are present
@@ -18,9 +19,13 @@ export async function POST(request: Request) {
     }
 
     // Insert new medicine for the authenticated user
+    // const abc = `INSERT INTO my_medicine (name, description, day, time, user_id)
+    //   VALUES (${name}, ${description}, ${day}, ${time}, ${user_id})
+    //   RETURNING *;`;
+    // console.log("abc", abc);
     const response = await sql`
       INSERT INTO my_medicine (name, description, day, time, user_id)
-      VALUES (${name}, ${description}, ${day}, ${time}, ${user_id})
+      VALUES (${name}, ${description}, ${day}, ${JSON.stringify(time)}, ${user_id})
       RETURNING *;
     `;
 

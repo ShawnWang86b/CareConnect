@@ -19,13 +19,14 @@ type itemProps = {
   name: string;
   description: string;
   day: string;
-  time: string[];
+  time: [{ timeSlot: string; isTaken: boolean }];
   user_id: string;
 };
 
 const MedicineCard = ({ item }: MedicineCardProps) => {
   const { user } = useUser();
   const userId = user?.id;
+
   const [modalVisible, setModalVisible] = useState(false);
 
   const handleDelete = async () => {
@@ -61,19 +62,24 @@ const MedicineCard = ({ item }: MedicineCardProps) => {
       </View>
 
       <FlatList
-        data={item.time}
-        renderItem={({ item }) => (
-          <View className="bg-sky-500 rounded-md p-2 mr-2 mb-4">
-            <Text className="text-white">{item}</Text>
-          </View>
+        data={item.time} // Assuming item.time is an array of objects
+        keyExtractor={(timeItem, index) => index.toString()} // Provide a unique key for each item
+        renderItem={({ item: timeItem, index }) => (
+          <TouchableOpacity>
+            <View className="bg-sky-500 rounded-md p-2 mr-2 mb-4">
+              {/* Render the time */}
+
+              <Text className="text-white">{timeItem.timeSlot}</Text>
+            </View>
+          </TouchableOpacity>
         )}
         horizontal
       />
 
       <View className="flex flex-row gap-2 mb-2">
-        <TouchableOpacity>
+        {/* <TouchableOpacity>
           <Text className="underline">Edit</Text>
-        </TouchableOpacity>
+        </TouchableOpacity> */}
 
         <TouchableOpacity onPress={handleDeleteModal}>
           <Text className="underline">Remove</Text>

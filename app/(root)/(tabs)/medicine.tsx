@@ -58,7 +58,7 @@ const Medicine = () => {
   const { data, loading, error } = useFetch<any[]>(
     `/(api)/(myMedicine)/${userId}/${userSelectedDate}`
   );
-  console.log("data", data);
+  console.log("Fetch_data", data);
 
   // Handle time picker confirmation
   const handleConfirmTime = (time: Date) => {
@@ -87,7 +87,12 @@ const Medicine = () => {
 
   // Handle form submission
   const onSubmit = async (data: any) => {
-    // console.log("Form Data:", data);
+    const formattedTimes = selectedTimes.map((time) => ({
+      timeSlot: time.trim(), // Remove any leading/trailing spaces
+      isTaken: false,
+    }));
+    console.log("Form Data11111", data);
+    console.log("Form formattedTimes", formattedTimes);
     try {
       const { response } = await fetchAPI("/(api)/(myMedicine)/create", {
         method: "POST",
@@ -96,11 +101,11 @@ const Medicine = () => {
           name: data.medicineName,
           description: data.description,
           day: userSelectedDate,
-          time: data.selectedTimes,
+          time: formattedTimes,
           user_id: userId,
         }),
       });
-      // console.log("response", response);
+      console.log("response", response);
       setModalVisible(false);
       setSelectedTimes([]); // clear selected times after submission
     } catch {}
