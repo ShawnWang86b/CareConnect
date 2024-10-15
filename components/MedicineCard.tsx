@@ -12,6 +12,7 @@ import { useUser } from "@clerk/clerk-expo";
 
 type MedicineCardProps = {
   item: itemProps;
+  refetch: any;
 };
 
 type itemProps = {
@@ -19,15 +20,41 @@ type itemProps = {
   name: string;
   description: string;
   day: string;
-  time: [{ timeSlot: string; isTaken: boolean }];
+  time: { timeSlot: string; isTaken: boolean }[];
   user_id: string;
 };
 
-const MedicineCard = ({ item }: MedicineCardProps) => {
+const MedicineCard = ({ item, refetch }: MedicineCardProps) => {
   const { user } = useUser();
   const userId = user?.id;
 
   const [modalVisible, setModalVisible] = useState(false);
+
+  const handleToggleIsTaken = async (index: number) => {
+    let updatedItem = { ...item };
+    updatedItem = {
+      ...item,
+      time: item.time.map((timeSlot, i) =>
+        i === index ? { ...timeSlot, isTaken: !timeSlot.isTaken } : timeSlot
+      ),
+    };
+    console.log("updatedItem", updatedItem);
+    try {
+      const response = await fetchAPI("/(api)/(myMedicine)/editTaken", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(updatedItem),
+      });
+      refetch();
+      if (!response.ok) {
+        const errorBody = await response.text();
+        console.error("Error response:", errorBody);
+      }
+
+      const result = await response.json();
+      console.log("Success:", result);
+    } catch {}
+  };
 
   const handleDelete = async () => {
     try {
@@ -39,6 +66,7 @@ const MedicineCard = ({ item }: MedicineCardProps) => {
           user_id: userId,
         }),
       });
+      refetch();
       setModalVisible(false);
     } catch {}
   };
@@ -65,10 +93,12 @@ const MedicineCard = ({ item }: MedicineCardProps) => {
         data={item.time} // Assuming item.time is an array of objects
         keyExtractor={(timeItem, index) => index.toString()} // Provide a unique key for each item
         renderItem={({ item: timeItem, index }) => (
-          <TouchableOpacity>
-            <View className="bg-sky-500 rounded-md p-2 mr-2 mb-4">
-              {/* Render the time */}
-
+          <TouchableOpacity onPress={() => handleToggleIsTaken(index)}>
+            <View
+              className={`rounded-md p-2 mr-2 mb-4 ${
+                timeItem.isTaken ? "bg-green-500" : "bg-sky-500"
+              }`}
+            >
               <Text className="text-white">{timeItem.timeSlot}</Text>
             </View>
           </TouchableOpacity>

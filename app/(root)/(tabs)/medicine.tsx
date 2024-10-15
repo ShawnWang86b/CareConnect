@@ -37,8 +37,7 @@ const Medicine = () => {
   const [modalVisible, setModalVisible] = useState(false);
   const [selectedTimes, setSelectedTimes] = useState<string[]>([]);
   const [isTimePickerVisible, setTimePickerVisible] = useState(false);
-  const { dateList, setDateList, userSelectedDate, setUserSelectedDate } =
-    useDateList();
+  const { userSelectedDate } = useDateList();
 
   const {
     control,
@@ -55,7 +54,7 @@ const Medicine = () => {
   });
 
   // fetch data
-  const { data, loading, error } = useFetch<any[]>(
+  const { data, loading, error, refetch } = useFetch<any[]>(
     `/(api)/(myMedicine)/${userId}/${userSelectedDate}`
   );
   console.log("Fetch_data", data);
@@ -91,8 +90,7 @@ const Medicine = () => {
       timeSlot: time.trim(), // Remove any leading/trailing spaces
       isTaken: false,
     }));
-    console.log("Form Data11111", data);
-    console.log("Form formattedTimes", formattedTimes);
+
     try {
       const { response } = await fetchAPI("/(api)/(myMedicine)/create", {
         method: "POST",
@@ -105,7 +103,8 @@ const Medicine = () => {
           user_id: userId,
         }),
       });
-      console.log("response", response);
+      refetch();
+
       setModalVisible(false);
       setSelectedTimes([]); // clear selected times after submission
     } catch {}
@@ -275,7 +274,7 @@ const Medicine = () => {
           data={data}
           renderItem={({ item }) => (
             <Text>
-              <MedicineCard item={item} />
+              <MedicineCard item={item} refetch={refetch} />
             </Text>
           )}
         />

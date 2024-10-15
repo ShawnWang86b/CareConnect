@@ -8,7 +8,7 @@ export async function GET(request: Request, params: any) {
     //     status: 400,
     //   });
     // }
-    console.log("params", params);
+    // console.log("params", params);
 
     const sql = neon(`${process.env.DATABASE_URL}`);
 

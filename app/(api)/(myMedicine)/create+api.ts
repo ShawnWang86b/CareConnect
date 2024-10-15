@@ -5,7 +5,7 @@ export async function POST(request: Request) {
     const sql = neon(`${process.env.DATABASE_URL}`);
 
     const body = await request.json();
-    console.log("body", body);
+    // console.log("body", body);
     const { name, description, day, time, user_id } = body; // Add your necessary medicine fields
 
     // Ensure all required fields are present
