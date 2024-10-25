@@ -29,12 +29,12 @@ const RideCard = ({
           />
 
           <View className="flex flex-col mx-5 gap-y-5 flex-1">
-            <View className="flex flex-row items-center gap-x-2">
+            {/* <View className="flex flex-row items-center gap-x-2">
               <Image source={icons.to} className="w-5 h-5" />
               <Text className="text-md font-JakartaMedium" numberOfLines={1}>
                 {origin_address}
               </Text>
-            </View>
+            </View> */}
 
             <View className="flex flex-row items-center gap-x-2">
               <Image source={icons.point} className="w-5 h-5" />
@@ -57,19 +57,19 @@ const RideCard = ({
 
           <View className="flex flex-row items-center w-full justify-between mb-5">
             <Text className="text-md font-JakartaMedium text-gray-500">
-              Driver
+              Shop
             </Text>
             <Text className="text-md font-JakartaBold">
               {driver.first_name} {driver.last_name}
             </Text>
           </View>
 
-          <View className="flex flex-row items-center w-full justify-between mb-5">
+          {/* <View className="flex flex-row items-center w-full justify-between mb-5">
             <Text className="text-md font-JakartaMedium text-gray-500">
               Car Seats
             </Text>
             <Text className="text-md font-JakartaBold">{driver.car_seats}</Text>
-          </View>
+          </View> */}
 
           <View className="flex flex-row items-center w-full justify-between">
             <Text className="text-md font-JakartaMedium text-gray-500">

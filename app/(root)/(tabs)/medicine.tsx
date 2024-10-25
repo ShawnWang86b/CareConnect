@@ -9,6 +9,7 @@ import {
   TextInput,
   ScrollView,
   FlatList,
+  Image,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import DateTimePickerModal from "react-native-modal-datetime-picker";
@@ -20,6 +21,7 @@ import { useUser } from "@clerk/clerk-expo";
 import { fetchAPI, useFetch } from "@/lib/fetch";
 import { useDateList } from "@/store";
 import MedicineCard from "@/components/MedicineCard";
+import { images } from "@/constants";
 
 // Zod schema for form validation
 const schema = z.object({
@@ -279,9 +281,15 @@ const Medicine = () => {
           )}
         />
       ) : (
-        <Text className="px-5 mt-5 text-lg font-JakartaBold flex justify-center items-start">
-          No medicine plan today!
-        </Text>
+        <View className="relative">
+          <Text className="z-10 absolute top-10 px-5 mt-5 text-2xl font-JakartaBold flex justify-center items-start">
+            No medicine plan today!
+          </Text>
+          <Image
+            source={images.noCard}
+            className="w-[500px] h-[500px] mx-auto my-5"
+          />
+        </View>
       )}
     </SafeAreaView>
   );

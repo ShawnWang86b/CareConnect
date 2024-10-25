@@ -30,7 +30,8 @@ import noResult from "@/assets/images/no-result.png";
 import onboarding1 from "@/assets/images/onboarding1.png";
 import onboarding2 from "@/assets/images/onboarding2.png";
 import onboarding3 from "@/assets/images/onboarding3.png";
-import signUpCar from "@/assets/images/signup-car.png";
+import signUpCar from "@/assets/images/signup.png";
+import noCard from "@/assets/images/noCard.png";
 
 export const images = {
   onboarding1,
@@ -41,6 +42,7 @@ export const images = {
   check,
   noResult,
   message,
+  noCard,
 };
 
 export const icons = {
@@ -74,23 +76,23 @@ export const icons = {
 export const onboarding = [
   {
     id: 1,
-    title: "The perfect ride is just a tap away!",
+    title: "Welcome to Care Connect!",
     description:
-      "Your journey begins with Ryde. Find your ideal ride effortlessly.",
+      "Easily manage your medications and healthcare needs with just a few taps.",
     image: images.onboarding1,
   },
   {
     id: 2,
-    title: "Best car in your hands with Ryde",
+    title: "Direct access to pharmacies",
     description:
-      "Discover the convenience of finding your perfect ride with Ryde",
+      "Quickly connect to nearby pharmacies and order your medicines hassle-free.",
     image: images.onboarding2,
   },
   {
     id: 3,
-    title: "Your ride, your way. Let's go!",
+    title: "Stay on track with your medication",
     description:
-      "Enter your destination, sit back, and let us take care of the rest.",
+      "Set reminders for your medication times and never miss a dose.",
     image: images.onboarding3,
   },
 ];

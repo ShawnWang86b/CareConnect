@@ -14,11 +14,11 @@ const recentRids = [
   {
     ride_id: "1",
     origin_address: "Kathmandu, Nepal",
-    destination_address: "Pokhara, Nepal",
+    destination_address: "Tenancy T05/249 Middleborough Rd, Box Hill VIC 3128",
     origin_latitude: "27.717245",
     origin_longitude: "85.323961",
-    destination_latitude: "28.209583",
-    destination_longitude: "83.985567",
+    destination_latitude: "-37.83",
+    destination_longitude: "145.13",
     ride_time: 391,
     fare_price: "19500.00",
     payment_status: "paid",
@@ -27,8 +27,8 @@ const recentRids = [
     created_at: "2024-08-12 05:19:20.620007",
     driver: {
       driver_id: "2",
-      first_name: "David",
-      last_name: "Brown",
+      first_name: "Chemistry Warehouse,",
+      last_name: "Box Hill",
       profile_image_url:
         "https://ucarecdn.com/6ea6d83d-ef1a-483f-9106-837a3a5b3f67/-/preview/1000x666/",
       car_image_url:
@@ -40,9 +40,10 @@ const recentRids = [
   {
     ride_id: "2",
     origin_address: "Jalkot, MH",
-    destination_address: "Pune, Maharashtra, India",
-    origin_latitude: "18.609116",
-    origin_longitude: "77.165873",
+    destination_address:
+      "The Glen, Shop MM09A/235 Springvale Rd, Glen Waverley VIC 3150",
+    origin_latitude: "-37.87",
+    origin_longitude: "145.16",
     destination_latitude: "18.520430",
     destination_longitude: "73.856744",
     ride_time: 491,
@@ -53,8 +54,8 @@ const recentRids = [
     created_at: "2024-08-12 06:12:17.683046",
     driver: {
       driver_id: "1",
-      first_name: "James",
-      last_name: "Wilson",
+      first_name: "Chemist Warehouse,",
+      last_name: "The Glen Shopping Centre",
       profile_image_url:
         "https://ucarecdn.com/dae59f69-2c1f-48c3-a883-017bcf0f9950/-/preview/1000x666/",
       car_image_url:
@@ -66,9 +67,9 @@ const recentRids = [
   {
     ride_id: "3",
     origin_address: "Zagreb, Croatia",
-    destination_address: "Rijeka, Croatia",
-    origin_latitude: "45.815011",
-    origin_longitude: "15.981919",
+    destination_address: "Chemist Warehouse Glen Waverley - Kingsway",
+    origin_latitude: "-37.88",
+    origin_longitude: "145.16",
     destination_latitude: "45.327063",
     destination_longitude: "14.442176",
     ride_time: 124,
@@ -79,40 +80,14 @@ const recentRids = [
     created_at: "2024-08-12 08:49:01.809053",
     driver: {
       driver_id: "1",
-      first_name: "James",
-      last_name: "Wilson",
+      first_name: "Chemist Warehouse ",
+      last_name: "Glen Waverley - Kingsway",
       profile_image_url:
         "https://ucarecdn.com/dae59f69-2c1f-48c3-a883-017bcf0f9950/-/preview/1000x666/",
       car_image_url:
         "https://ucarecdn.com/a2dc52b2-8bf7-4e49-9a36-3ffb5229ed02/-/preview/465x466/",
       car_seats: 4,
       rating: "4.80",
-    },
-  },
-  {
-    ride_id: "4",
-    origin_address: "Okayama, Japan",
-    destination_address: "Osaka, Japan",
-    origin_latitude: "34.655531",
-    origin_longitude: "133.919795",
-    destination_latitude: "34.693725",
-    destination_longitude: "135.502254",
-    ride_time: 159,
-    fare_price: "7900.00",
-    payment_status: "paid",
-    driver_id: 3,
-    user_id: "1",
-    created_at: "2024-08-12 18:43:54.297838",
-    driver: {
-      driver_id: "3",
-      first_name: "Michael",
-      last_name: "Johnson",
-      profile_image_url:
-        "https://ucarecdn.com/0330d85c-232e-4c30-bd04-e5e4d0e3d688/-/preview/826x822/",
-      car_image_url:
-        "https://ucarecdn.com/289764fb-55b6-4427-b1d1-f655987b4a14/-/preview/930x932/",
-      car_seats: 4,
-      rating: "4.70",
     },
   },
 ];
@@ -159,8 +134,8 @@ const Home = () => {
       setUserLocation({
         // latitude: location.coords?.latitude!,
         // longitude: location.coords?.longitude!,
-        latitude: -37.85487938405651,
-        longitude: 145.15422597116384,
+        latitude: -37.85,
+        longitude: 145.15,
         address: `${address[0].name},${address[0].region}`,
       });
     };
@@ -210,7 +185,7 @@ const Home = () => {
               </View>
             </>
             <Text className="text-xl font-JakartaBold mt-5 mb-3">
-              Recent visit
+              Recent visit chemisty store
             </Text>
           </>
         )}
