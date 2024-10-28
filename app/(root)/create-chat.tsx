@@ -5,14 +5,11 @@ import { icons } from "@/constants";
 import { useState } from "react";
 import InputField from "@/components/InputField";
 import CustomButton from "@/components/CustomButton";
-import { OPEN_AI_SECRET_KEY } from "@env";
 
 const CreateChat = () => {
-  const abc = OPEN_AI_SECRET_KEY;
   const [form, setForm] = useState({ prompt: "" });
   const handlePromptSend = () => {
     console.log(form.prompt);
-    console.log(abc);
   };
   return (
     <SafeAreaView>
