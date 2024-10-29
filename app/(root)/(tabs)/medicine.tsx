@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import DateList from "@/components/DateList";
 import { Ionicons } from "@expo/vector-icons";
 import {
@@ -40,6 +40,10 @@ const Medicine = () => {
   const [selectedTimes, setSelectedTimes] = useState<string[]>([]);
   const [isTimePickerVisible, setTimePickerVisible] = useState(false);
   const { userSelectedDate } = useDateList();
+  const [start_date, setStartDate] = useState("");
+  const [end_date, setEndDate] = useState("");
+  const [isStartDatePickerVisible, setStartDatePickerVisible] = useState(false);
+  const [isEndDatePickerVisible, setEndDatePickerVisible] = useState(false);
 
   const {
     control,
@@ -51,13 +55,15 @@ const Medicine = () => {
     defaultValues: {
       medicineName: "",
       description: "",
+      start_date: "",
+      end_date: "",
       selectedTimes: [],
     },
   });
 
   // fetch data
   const { data, loading, error, refetch } = useFetch<any[]>(
-    `/(api)/(myMedicine)/${userId}/${userSelectedDate}`
+    `/(api)/(myMedicine)/${userId}/${userSelectedDate}`,
   );
   console.log("Fetch_data", data);
 
@@ -71,6 +77,24 @@ const Medicine = () => {
     setTimePickerVisible(false);
   };
 
+  // Handle time picker confirmation
+  const handleConfirmStartDate = (date: Date) => {
+    const formattedTime = format(date, "MM-dd-yyyy");
+    setStartDate(formattedTime);
+    //@ts-ignore
+    setValue("start_date", [...start_date, formattedTime]); // update form state
+    hideStartDatePicker();
+  };
+
+  // Handle time picker confirmation
+  const handleConfirmEndDate = (date: Date) => {
+    const formattedTime = format(date, "MM-dd-yyyy");
+    setEndDate(formattedTime);
+    //@ts-ignore
+    setValue("end_date", [...end_date, formattedTime]); // update form state
+    hideEndDatePicker();
+  };
+
   // Open the modal for adding medicine
   const handlePress = () => {
     setModalVisible(true);
@@ -79,7 +103,7 @@ const Medicine = () => {
   // Remove selected time
   const removeTime = (index: number) => {
     const updatedTimes = selectedTimes.filter(
-      (_, timeIndex) => timeIndex !== index
+      (_, timeIndex) => timeIndex !== index,
     );
     setSelectedTimes(updatedTimes);
     //@ts-ignore
@@ -100,7 +124,8 @@ const Medicine = () => {
         body: JSON.stringify({
           name: data.medicineName,
           description: data.description,
-          day: userSelectedDate,
+          start_date: start_date,
+          end_date: end_date,
           time: formattedTimes,
           user_id: userId,
         }),
@@ -115,6 +140,14 @@ const Medicine = () => {
   // Handle time picker visibility
   const showTimePicker = () => setTimePickerVisible(true);
   const hideTimePicker = () => setTimePickerVisible(false);
+
+  // Handle date picker visibility
+  const showStartDatePicker = () => setStartDatePickerVisible(true);
+  const hideStartDatePicker = () => setStartDatePickerVisible(false);
+
+  const showEndDatePicker = () => setEndDatePickerVisible(true);
+  const hideEndDatePicker = () => setEndDatePickerVisible(false);
+
   {
     loading && <Text>Loading</Text>;
   }
@@ -201,6 +234,48 @@ const Medicine = () => {
                   </View>
                 )}
               />
+              <View className="flex-row justify-between">
+                {/* Select start date button */}
+                <TouchableOpacity
+                  onPress={showStartDatePicker}
+                  className="px-5 mb-5 border-[#ccc] rounded-md border-[1px] h-[50px] flex justify-center items-center flex-1 mr-2"
+                >
+                  <Text>Select Start Date</Text>
+                </TouchableOpacity>
+
+                {/* Select end date button */}
+                <TouchableOpacity
+                  onPress={showEndDatePicker}
+                  className="px-5 mb-5 border-[#ccc] rounded-md border-[1px] h-[50px] flex justify-center items-center flex-1 ml-2"
+                >
+                  <Text>Select End Date</Text>
+                </TouchableOpacity>
+              </View>
+
+              {/* display select date */}
+              {/* Show selected date if available */}
+              {start_date && (
+                <Text style={{ marginBottom: 6 }}>
+                  Start Date: {start_date}
+                </Text>
+              )}
+              {end_date && (
+                <Text style={{ marginBottom: 10 }}>End Date: {end_date}</Text>
+              )}
+              <DateTimePickerModal
+                isVisible={isStartDatePickerVisible}
+                mode="date"
+                onConfirm={handleConfirmStartDate}
+                onCancel={hideStartDatePicker}
+              />
+
+              {/* End date picker modal */}
+              <DateTimePickerModal
+                isVisible={isEndDatePickerVisible}
+                mode="date"
+                onConfirm={handleConfirmEndDate}
+                onCancel={hideEndDatePicker}
+              />
 
               {/* Select time button */}
               <TouchableOpacity
@@ -275,10 +350,15 @@ const Medicine = () => {
           className="bg-white m-4 p-4"
           data={data}
           renderItem={({ item }) => (
-            <Text>
+            <View style={{ marginBottom: 10 }}>
               <MedicineCard item={item} refetch={refetch} />
-            </Text>
+            </View>
           )}
+          contentContainerStyle={{
+            justifyContent: "center",
+            alignItems: "center",
+            paddingTop: 5,
+          }}
         />
       ) : (
         <View className="relative">

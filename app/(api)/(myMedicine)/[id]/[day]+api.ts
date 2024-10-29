@@ -14,7 +14,7 @@ export async function GET(request: Request, params: any) {
 
     // Fetch only medicines belonging to the logged-in user for the specific day
     const response = await sql`
-      SELECT * FROM "my_medicine" WHERE "user_id" = ${id} AND "day" = ${day}`;
+      SELECT * FROM "my_medicine" WHERE "user_id" = ${id} AND ${day} BETWEEN "start_date" AND "end_date"`;
 
     return new Response(JSON.stringify({ data: response }), { status: 200 });
   } catch (error) {
