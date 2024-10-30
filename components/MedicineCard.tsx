@@ -201,11 +201,10 @@ const MedicineCard = ({ item, refetch }: MedicineCardProps) => {
   return (
     <View className="w-[330px] flex justify-center bg-slate-100 rounded-lg mb-3 px-4 mx-4">
       <Text className="text-lg font-JakartaBold mt-2">
-        Medicine Card #{item.id}
+        Medicine: {item.name}
       </Text>
       <View className="flex justify-start mb-4">
-        <Text>{item.name}</Text>
-        <Text>{item.description}</Text>
+        <Text>description: {item.description}</Text>
       </View>
 
       <FlatList
@@ -225,6 +224,7 @@ const MedicineCard = ({ item, refetch }: MedicineCardProps) => {
         horizontal
       />
 
+      {/* edit and delte button */}
       <View className="flex flex-row gap-2 mb-2">
         <TouchableOpacity onPress={() => setEditModalVisible(true)}>
           <Text className="underline">Edit</Text>
@@ -235,6 +235,7 @@ const MedicineCard = ({ item, refetch }: MedicineCardProps) => {
         </TouchableOpacity>
       </View>
 
+      {/* edit model */}
       <Modal
         visible={editModalVisible}
         transparent={true}

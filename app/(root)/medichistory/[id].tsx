@@ -1,4 +1,4 @@
-import { View, Text, FlatList } from "react-native";
+import { View, Text, FlatList, ScrollView } from "react-native";
 import { Stack, useLocalSearchParams } from "expo-router";
 import { useEffect, useState } from "react";
 import { neon } from "@neondatabase/serverless";
@@ -33,13 +33,13 @@ const MedicHistoryPage = () => {
   }, []);
 
   return (
-    <View style={{ height: "100%" }}>
+    <ScrollView style={{ height: "100%" }}>
       <Stack.Screen
-        options={{ headerTitle: `My Medicine`, headerBackTitle: "Back" }}
+        options={{ headerTitle: `My Medicines`, headerBackTitle: "Back" }}
       />
       {history && history.length > 0 ? (
         <>
-          <View style={{ height: "50%" }}>
+          <View style={{ marginTop: "5%" }}>
             <Text
               className="text-xl capitalize font-JakartaExtraBold"
               style={{ paddingLeft: "3%" }}
@@ -60,7 +60,7 @@ const MedicHistoryPage = () => {
                 return formatDate <= endDate && formatDate >= startDate;
               })}
               renderItem={({ item }) => (
-                <View style={{ marginBottom: 10 }}>
+                <View style={{ marginTop: 5 }}>
                   <MedicineCard item={item} refetch={fetchMyMedic} />
                 </View>
               )}
@@ -71,7 +71,7 @@ const MedicHistoryPage = () => {
               }}
             />
           </View>
-          <View style={{ height: "50%" }}>
+          <View>
             <Text
               className="text-xl capitalize font-JakartaExtraBold"
               style={{ paddingLeft: "3%" }}
@@ -88,7 +88,7 @@ const MedicHistoryPage = () => {
                 return formatDate > endDate;
               })}
               renderItem={({ item }) => (
-                <View style={{ marginBottom: 10 }}>
+                <View style={{ marginTop: 5 }}>
                   <MedicineCard item={item} refetch={fetchMyMedic} />
                 </View>
               )}
@@ -107,7 +107,7 @@ const MedicHistoryPage = () => {
           </Text>
         </View>
       )}
-    </View>
+    </ScrollView>
   );
 };
 

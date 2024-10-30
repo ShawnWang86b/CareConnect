@@ -9,7 +9,8 @@ export async function PUT(request: Request) {
     console.log("body.id", body.id);
     console.log("body.name", body.name);
     console.log("body.description", body.description);
-    console.log("body.day", body.day);
+    console.log("body.start_date", body.start_date);
+    console.log("body.end_date", body.end_date);
     console.log("body.time", body.time);
     console.log("body.user_id", body.user_id);
     // Ensure all required fields are present

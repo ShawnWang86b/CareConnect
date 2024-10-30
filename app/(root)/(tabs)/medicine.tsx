@@ -158,14 +158,14 @@ const Medicine = () => {
         <Text className="text-xl capitalize font-JakartaExtraBold">
           My medicine plan
         </Text>
-        <Link href={`/(root)/medichistory/${userId}`} style={{ color: "blue" }}>
-          My Medicine
+        <Link href={`/(root)/medichistory/${userId}`} style={{ color: "#1E90FF" }}>
+          my medicines
         </Link>
         <TouchableOpacity
           onPress={handlePress}
           className="justify-center items-center w-10 h-10 rounded-full bg-white"
         >
-          <Ionicons name="add" size={24} color="black" />
+          <Ionicons name="menu-outline" size={24} color="black" />
         </TouchableOpacity>
       </View>
 
@@ -354,7 +354,7 @@ const Medicine = () => {
           className="bg-white m-4 p-4"
           data={data}
           renderItem={({ item }) => (
-            <View style={{ marginBottom: 10 }}>
+            <View style={{ marginTop: 5 }}>
               <MedicineCard item={item} refetch={refetch} />
             </View>
           )}
