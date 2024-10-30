@@ -21,7 +21,7 @@ const getThisWeek = () => {
 const DateList = () => {
   const dates = getThisWeek();
   const [dateSelected, setDateSelected] = useState<Date>(
-    dates.find((day) => day.isToday)?.date || new Date(),
+    dates.find((day) => day.isToday)?.date || new Date()
   );
   // console.log("dateSelected", dateSelected);
   const { dateList, setDateList, userSelectedDate, setUserSelectedDate } =
@@ -32,11 +32,12 @@ const DateList = () => {
   }, []);
 
   useEffect(() => {
-    const formatDate = dateSelected
-      .toLocaleDateString()
-      .split("T")[0]
-      .split("/")
-      .join("-");
+    // const formatDate = dateSelected
+    //   .toLocaleDateString()
+    //   .split("T")[0]
+    //   .split("/")
+    //   .join("-");
+    const formatDate = format(dateSelected, "MM-dd-yyyy");
     setUserSelectedDate(formatDate);
   }, [dateSelected]);
 

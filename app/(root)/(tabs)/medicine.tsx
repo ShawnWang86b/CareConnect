@@ -22,6 +22,7 @@ import { fetchAPI, useFetch } from "@/lib/fetch";
 import { useDateList } from "@/store";
 import MedicineCard from "@/components/MedicineCard";
 import { images } from "@/constants";
+import { Link } from "expo-router";
 
 // Zod schema for form validation
 const schema = z.object({
@@ -157,6 +158,9 @@ const Medicine = () => {
         <Text className="text-xl capitalize font-JakartaExtraBold">
           My medicine plan
         </Text>
+        <Link href={`/(root)/medichistory/${userId}`} style={{ color: "blue" }}>
+          My Medicine
+        </Link>
         <TouchableOpacity
           onPress={handlePress}
           className="justify-center items-center w-10 h-10 rounded-full bg-white"

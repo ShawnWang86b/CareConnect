@@ -5,7 +5,7 @@ export async function PUT(request: Request) {
     const sql = neon(`${process.env.DATABASE_URL}`);
 
     const body = await request.json();
-    const { id, name, description, day, time, user_id } = body;
+    const { id, name, description, start_date, end_date, time, user_id } = body;
     console.log("body.id", body.id);
     console.log("body.name", body.name);
     console.log("body.description", body.description);
@@ -24,7 +24,7 @@ export async function PUT(request: Request) {
 
     const response111 = `
     UPDATE my_medicine
-    SET name = ${name}, description = ${description},day = ${day},time = ${JSON.stringify(time)}
+    SET name = ${name}, description = ${description},start_date = ${start_date},end_date=${end_date},time = ${JSON.stringify(time)}
     WHERE id = ${id} AND user_id = ${user_id}
     RETURNING *;
   `;
@@ -33,7 +33,7 @@ export async function PUT(request: Request) {
 
     const response = await sql`
       UPDATE my_medicine
-      SET "name" = ${name}, "description" = ${description},"day" = ${day},"time" = ${JSON.stringify(time)}
+      SET "name" = ${name}, "description" = ${description},start_date = ${start_date},end_date=${end_date},"time" = ${JSON.stringify(time)}
       WHERE "id" = ${id} AND "user_id" = ${user_id}
       RETURNING *;
     `;
