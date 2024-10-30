@@ -18,7 +18,6 @@ export async function PUT(request: Request) {
       );
     }
 
-    console.log("测试" + description);
     // Update existing medicine for the authenticated user
     const response = await sql`
       UPDATE my_medicine 
@@ -36,7 +35,7 @@ export async function PUT(request: Request) {
         JSON.stringify({ error: "Medicine not found or not authorized" }),
         {
           status: 404,
-        }
+        },
       );
     }
 

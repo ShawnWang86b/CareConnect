@@ -33,15 +33,23 @@ type itemProps = {
 };
 
 // Zod schema for form validation
-const schema = z.object({
-  editedMedName: z.string().min(1, { message: "Medicine name is required" }),
-  editedDscp: z.string().min(1, { message: "Description is required" }),
-  // editedStartDate: z.string().min(1, "Start sate is required"),
-  // editedEndDate: z.string().min(1, "End sate is required"),
-  editedTimes: z
-    .array(z.string())
-    .min(1, { message: "Please select at least one time" }),
-});
+const schema = z
+  .object({
+    editedMedName: z.string().min(1, { message: "Medicine name is required" }),
+    editedDscp: z.string().min(1, { message: "Description is required" }),
+    editedStartDate: z.string().min(1, { message: "Start date is required" }),
+    editedEndDate: z.string().min(1, { message: "End date is required" }),
+    editedTimes: z
+      .array(z.string())
+      .min(1, { message: "Please select at least one time" }),
+  })
+  .refine(
+    (data) => new Date(data.editedEndDate) >= new Date(data.editedStartDate),
+    {
+      message: "End date cannot be before start date",
+      path: ["editedEndDate"], // This will assign the error to `end_date` field
+    },
+  );
 
 const MedicineCard = ({ item, refetch }: MedicineCardProps) => {
   const { user } = useUser();
@@ -103,13 +111,34 @@ const MedicineCard = ({ item, refetch }: MedicineCardProps) => {
   };
 
   const handleEdit = async (data: any) => {
+    const existingTimes = item.time; // This should contain the existing time slots
+    const editedTimeSlots = new Set(editedTimes); // Set of edited time slots
+
+    // Filter out existing times not present in editedTimes
+    const retainedExistingTimes = existingTimes.filter((existing) =>
+      editedTimeSlots.has(existing.timeSlot),
+    );
+
+    // Map edited times to create updated times array with new slots set to isTaken: false
+    const updatedTimes = editedTimes.map((timeSlot) => {
+      const existingTime = retainedExistingTimes.find((time) => time.timeSlot === timeSlot);
+      return {
+        timeSlot: timeSlot.trim(),
+        isTaken: existingTime ? existingTime.isTaken : false, // Retain existing isTaken if present, else set to false
+      };
+    });
+
+    // Final array with removed slots excluded
+    const finalTimes = [...updatedTimes];
+
     const updatedMedicine = {
       id: item.id,
       name: data.editedMedName, // Get these from the form state
       description: data.editedDscp,
       start_date: editedStartDate,
       end_date: editedEndDate,
-      time: editedTimes.map((timeSlot) => ({ timeSlot, isTaken: false })), // or whatever your logic is for isTaken
+      time: finalTimes,
+      // time: editedTimes.map((timeSlot) => ({ timeSlot, isTaken: false })),
       user_id: userId,
     };
 
@@ -165,7 +194,7 @@ const MedicineCard = ({ item, refetch }: MedicineCardProps) => {
     const formattedTime = format(time, " h:mm a");
     setEditedTimes((prevTimes) => [...prevTimes, formattedTime]);
     //@ts-ignore
-    setValue("editedTimes", [...selectedTimes, formattedTime]); // update form state
+    setValue("editedTimes", [...editedTimes, formattedTime]); // update form state
     setTimePickerVisible(false);
   };
 
@@ -174,7 +203,7 @@ const MedicineCard = ({ item, refetch }: MedicineCardProps) => {
     const formattedTime = format(date, "MM-dd-yyyy");
     setEditedStartDate(formattedTime);
     //@ts-ignore
-    setValue("editedStartDate", [...editedStartDate, formattedTime]); // update form state
+    setValue("editedStartDate", formattedTime); // update form state
     hideStartDatePicker();
   };
 
@@ -183,7 +212,7 @@ const MedicineCard = ({ item, refetch }: MedicineCardProps) => {
     const formattedTime = format(date, "MM-dd-yyyy");
     setEditedEndDate(formattedTime);
     //@ts-ignore
-    setValue("editedEndDate", [...editedEndDate, formattedTime]); // update form state
+    setValue("editedEndDate", formattedTime); // update form state
     hideEndDatePicker();
   };
 
@@ -260,7 +289,7 @@ const MedicineCard = ({ item, refetch }: MedicineCardProps) => {
                   <View>
                     <Text className="mb-2">Medicine Name</Text>
                     <TextInput
-                      className="px-5 mb-5 border-[#ccc] rounded-md border-[1px] h-[50px]"
+                      className="px-5 mb-3 border-[#ccc] rounded-md border-[1px] h-[50px]"
                       placeholder="Medicine Name"
                       onBlur={onBlur}
                       value={value}
@@ -283,7 +312,7 @@ const MedicineCard = ({ item, refetch }: MedicineCardProps) => {
                   <View>
                     <Text className="mb-2">Description</Text>
                     <TextInput
-                      className="px-5 mb-5 border-[#ccc] rounded-md border-[1px] h-[50px]"
+                      className="px-5 mb-3 border-[#ccc] rounded-md border-[1px] h-[50px]"
                       placeholder="Description"
                       onBlur={onBlur}
                       value={value}
@@ -315,6 +344,17 @@ const MedicineCard = ({ item, refetch }: MedicineCardProps) => {
                   <Text>Select End Date</Text>
                 </TouchableOpacity>
               </View>
+
+              {errors.editedStartDate && (
+                <Text className="text-red-500 mb-5">
+                  {errors.editedStartDate.message}
+                </Text>
+              )}
+              {errors.editedEndDate && (
+                <Text className="text-red-500 mb-5">
+                  {errors.editedEndDate.message}
+                </Text>
+              )}
 
               {/* display select date */}
               {/* Show selected date if available */}
@@ -351,7 +391,7 @@ const MedicineCard = ({ item, refetch }: MedicineCardProps) => {
                 {editedTimes.length > 0 ? (
                   <Text>Add Another Time</Text>
                 ) : (
-                  <Text>Add Time</Text>
+                  <Text>Select Time</Text>
                 )}
               </TouchableOpacity>
 
@@ -388,24 +428,28 @@ const MedicineCard = ({ item, refetch }: MedicineCardProps) => {
               />
 
               {/* Submit button */}
-              <TouchableOpacity
-                className="bg-sky-500 h-[50px] flex justify-center items-center rounded-md"
-                onPress={handleSubmit(handleEdit)}
-              >
-                <Text style={{ color: "white", fontWeight: "bold" }}>
-                  Save Medicine Plan
-                </Text>
-              </TouchableOpacity>
-
-              {/* Cancel button */}
-              <TouchableOpacity
-                className="bg-[#f44336] mt-5 h-[50px] flex justify-center items-center rounded-md"
-                onPress={() => setEditModalVisible(false)}
-              >
-                <Text style={{ color: "white", fontWeight: "bold" }}>
-                  Cancel
-                </Text>
-              </TouchableOpacity>
+              <View style={{ flexDirection: "row" }}>
+                {/* Cancel button */}
+                <TouchableOpacity
+                  className="bg-[#f44336] h-[50px] flex justify-center items-center rounded-md"
+                  onPress={() => setEditModalVisible(false)}
+                  style={{ flex: 1, marginRight: 5 }}
+                >
+                  <Text style={{ color: "white", fontWeight: "bold" }}>
+                    Cancel
+                  </Text>
+                </TouchableOpacity>
+                {/* Save button */}
+                <TouchableOpacity
+                  className="bg-sky-500 h-[50px] flex justify-center items-center rounded-md"
+                  onPress={handleSubmit(handleEdit)}
+                  style={{ flex: 1, marginLeft: 5 }}
+                >
+                  <Text style={{ color: "white", fontWeight: "bold" }}>
+                    Save
+                  </Text>
+                </TouchableOpacity>
+              </View>
             </ScrollView>
           </View>
         </View>

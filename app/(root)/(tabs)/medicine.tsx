@@ -23,27 +23,27 @@ import { fetchAPI, useFetch } from "@/lib/fetch";
 import { useDateList } from "@/store";
 import MedicineCard from "@/components/MedicineCard";
 import { images } from "@/constants";
-import { Link, useNavigation } from "expo-router";
-// import Dropdown from "react-bootstrap/Dropdown";
-// import { Button, Menu, Divider } from "react-native-paper";
-// import Button from "@mui/material/Button";
-// import Menu from "@mui/material/Menu";
-// import MenuItem from "@mui/material/MenuItem";
-// import PopupState, { bindTrigger, bindMenu } from "material-ui-popup-state";
+import { Link } from "expo-router";
 
 // Zod schema for form validation
-const schema = z.object({
-  medicineName: z.string().min(1, { message: "Medicine name is required" }),
-  description: z.string().min(1, { message: "Description is required" }),
-  selectedTimes: z
-    .array(z.string())
-    .min(1, { message: "Please select at least one time" }),
-});
+const schema = z
+  .object({
+    medicineName: z.string().min(1, { message: "Medicine name is required" }),
+    description: z.string().min(1, { message: "Description is required" }),
+    start_date: z.string().min(1, { message: "Start date is required" }),
+    end_date: z.string().min(1, { message: "End date is required" }),
+    selectedTimes: z
+      .array(z.string())
+      .min(1, { message: "Please select at least one time" }),
+  })
+  .refine((data) => new Date(data.end_date) >= new Date(data.start_date), {
+    message: "End date cannot be before start date",
+    path: ["end_date"], // This will assign the error to `end_date` field
+  });
 
 const Medicine = () => {
   const { user } = useUser();
   const userId = user?.id;
-  const navigation = useNavigation();
 
   const [modalVisible, setModalVisible] = useState(false);
   const [selectedTimes, setSelectedTimes] = useState<string[]>([]);
@@ -95,7 +95,7 @@ const Medicine = () => {
     const formattedTime = format(date, "MM-dd-yyyy");
     setStartDate(formattedTime);
     //@ts-ignore
-    setValue("start_date", [...start_date, formattedTime]); // update form state
+    setValue("start_date", formattedTime); // update form state
     hideStartDatePicker();
   };
 
@@ -104,7 +104,7 @@ const Medicine = () => {
     const formattedTime = format(date, "MM-dd-yyyy");
     setEndDate(formattedTime);
     //@ts-ignore
-    setValue("end_date", [...end_date, formattedTime]); // update form state
+    setValue("end_date", formattedTime); // update form state
     hideEndDatePicker();
   };
 
@@ -150,7 +150,11 @@ const Medicine = () => {
       });
       refetch();
 
+      setValue("description", "");
+      setValue("medicineName", "");
       setModalVisible(false);
+      setStartDate("");
+      setEndDate("");
       setSelectedTimes([]); // clear selected times after submission
     } catch {}
   };
@@ -260,7 +264,7 @@ const Medicine = () => {
                   <View>
                     <Text className="mb-2">Medicine Name</Text>
                     <TextInput
-                      className="px-5 mb-5 border-[#ccc] rounded-md border-[1px] h-[50px]"
+                      className="px-5 mb-3 border-[#ccc] rounded-md border-[1px] h-[50px]"
                       placeholder="Medicine Name"
                       onBlur={onBlur}
                       value={value}
@@ -283,7 +287,7 @@ const Medicine = () => {
                   <View>
                     <Text className="mb-2">Description</Text>
                     <TextInput
-                      className="px-5 mb-5 border-[#ccc] rounded-md border-[1px] h-[50px]"
+                      className="px-5 mb-3 border-[#ccc] rounded-md border-[1px] h-[50px]"
                       placeholder="Description"
                       onBlur={onBlur}
                       value={value}
@@ -314,6 +318,17 @@ const Medicine = () => {
                   <Text>Select End Date</Text>
                 </TouchableOpacity>
               </View>
+
+              {errors.start_date && (
+                <Text className="text-red-500 mb-5">
+                  {errors.start_date.message}
+                </Text>
+              )}
+              {errors.end_date && (
+                <Text className="text-red-500 mb-5">
+                  {errors.end_date.message}
+                </Text>
+              )}
 
               {/* display select date */}
               {/* Show selected date if available */}
@@ -385,24 +400,28 @@ const Medicine = () => {
               />
 
               {/* Submit button */}
-              <TouchableOpacity
-                className="bg-sky-500 h-[50px] flex justify-center items-center rounded-md"
-                onPress={handleSubmit(onSubmit)}
-              >
-                <Text style={{ color: "white", fontWeight: "bold" }}>
-                  Save Medicine Plan
-                </Text>
-              </TouchableOpacity>
-
-              {/* Cancel button */}
-              <TouchableOpacity
-                className="bg-[#f44336] mt-5 h-[50px] flex justify-center items-center rounded-md"
-                onPress={() => setModalVisible(false)}
-              >
-                <Text style={{ color: "white", fontWeight: "bold" }}>
-                  Cancel
-                </Text>
-              </TouchableOpacity>
+              <View style={{ flexDirection: "row" }}>
+                {/* Cancel button */}
+                <TouchableOpacity
+                  className="bg-[#f44336] h-[50px] flex justify-center items-center rounded-md"
+                  onPress={() => setModalVisible(false)}
+                  style={{ flex: 1, marginRight: 5 }}
+                >
+                  <Text style={{ color: "white", fontWeight: "bold" }}>
+                    Cancel
+                  </Text>
+                </TouchableOpacity>
+                {/* Save button */}
+                <TouchableOpacity
+                  className="bg-sky-500 h-[50px] flex justify-center items-center rounded-md"
+                  onPress={handleSubmit(onSubmit)}
+                  style={{ flex: 1, marginLeft: 5 }}
+                >
+                  <Text style={{ color: "white", fontWeight: "bold" }}>
+                    Save
+                  </Text>
+                </TouchableOpacity>
+              </View>
             </ScrollView>
           </View>
         </View>

@@ -28,7 +28,6 @@ export async function POST(request: Request) {
       VALUES (${name}, ${description}, ${start_date}, ${end_date}, ${JSON.stringify(time)}, ${user_id})
       RETURNING *;
     `;
-    console.log("成功");
 
     return new Response(
       JSON.stringify({
