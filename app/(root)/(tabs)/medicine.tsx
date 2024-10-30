@@ -10,6 +10,7 @@ import {
   ScrollView,
   FlatList,
   Image,
+  StyleSheet,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import DateTimePickerModal from "react-native-modal-datetime-picker";
@@ -22,7 +23,13 @@ import { fetchAPI, useFetch } from "@/lib/fetch";
 import { useDateList } from "@/store";
 import MedicineCard from "@/components/MedicineCard";
 import { images } from "@/constants";
-import { Link } from "expo-router";
+import { Link, useNavigation } from "expo-router";
+// import Dropdown from "react-bootstrap/Dropdown";
+// import { Button, Menu, Divider } from "react-native-paper";
+// import Button from "@mui/material/Button";
+// import Menu from "@mui/material/Menu";
+// import MenuItem from "@mui/material/MenuItem";
+// import PopupState, { bindTrigger, bindMenu } from "material-ui-popup-state";
 
 // Zod schema for form validation
 const schema = z.object({
@@ -36,6 +43,7 @@ const schema = z.object({
 const Medicine = () => {
   const { user } = useUser();
   const userId = user?.id;
+  const navigation = useNavigation();
 
   const [modalVisible, setModalVisible] = useState(false);
   const [selectedTimes, setSelectedTimes] = useState<string[]>([]);
@@ -45,6 +53,10 @@ const Medicine = () => {
   const [end_date, setEndDate] = useState("");
   const [isStartDatePickerVisible, setStartDatePickerVisible] = useState(false);
   const [isEndDatePickerVisible, setEndDatePickerVisible] = useState(false);
+
+  const [isOpen, setIsOpen] = useState(false);
+
+  const toggleMenu = () => setIsOpen(!isOpen);
 
   const {
     control,
@@ -99,6 +111,11 @@ const Medicine = () => {
   // Open the modal for adding medicine
   const handlePress = () => {
     setModalVisible(true);
+    hideMenu();
+  };
+
+  const hideMenu = () => {
+    setIsOpen(false);
   };
 
   // Remove selected time
@@ -149,6 +166,25 @@ const Medicine = () => {
   const showEndDatePicker = () => setEndDatePickerVisible(true);
   const hideEndDatePicker = () => setEndDatePickerVisible(false);
 
+  const styles = StyleSheet.create({
+    menu: {
+      backgroundColor: "#211e1e", // Background color of the menu
+      position: "absolute", // Positioning the menu absolutely
+      top: 40, // Distance from the top
+      right: 0, // Distance from the right
+      zIndex: 1, // Stack order
+      borderRadius: 4, // Optional: rounded corners
+      padding: 10, // Optional: inner spacing
+      width: 160,
+    },
+    menuText: {
+      borderColor: "white",
+      fontSize: 16,
+      color: "#FFF",
+      padding: 6,
+    },
+  });
+
   {
     loading && <Text>Loading</Text>;
   }
@@ -158,15 +194,38 @@ const Medicine = () => {
         <Text className="text-xl capitalize font-JakartaExtraBold">
           My medicine plan
         </Text>
-        <Link href={`/(root)/medichistory/${userId}`} style={{ color: "#1E90FF" }}>
+        {/* <Link href={`/(root)/medichistory/${userId}`} style={{ color: "#1E90FF" }}>
           my medicines
-        </Link>
-        <TouchableOpacity
+        </Link> */}
+
+        <View>
+          <TouchableOpacity onPress={toggleMenu}>
+            <Ionicons name="add" size={24} color="black" />
+          </TouchableOpacity>
+          {isOpen && (
+            <View style={styles.menu}>
+              <TouchableOpacity onPress={handlePress}>
+                <Text style={styles.menuText}>Add Medicine</Text>
+              </TouchableOpacity>
+              <TouchableOpacity>
+                <Text style={styles.menuText}>
+                  <Link
+                    onPress={hideMenu}
+                    href={`/(root)/medichistory/${userId}`}
+                  >
+                    Medicine Records
+                  </Link>
+                </Text>
+              </TouchableOpacity>
+            </View>
+          )}
+        </View>
+        {/* <TouchableOpacity
           onPress={handlePress}
           className="justify-center items-center w-10 h-10 rounded-full bg-white"
         >
           <Ionicons name="menu-outline" size={24} color="black" />
-        </TouchableOpacity>
+        </TouchableOpacity> */}
       </View>
 
       <View className="my-4">
