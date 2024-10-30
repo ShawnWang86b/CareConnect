@@ -21,7 +21,7 @@ const getThisWeek = () => {
 const DateList = () => {
   const dates = getThisWeek();
   const [dateSelected, setDateSelected] = useState<Date>(
-    dates.find((day) => day.isToday)?.date || new Date()
+    dates.find((day) => day.isToday)?.date || new Date(),
   );
   // console.log("dateSelected", dateSelected);
   const { dateList, setDateList, userSelectedDate, setUserSelectedDate } =

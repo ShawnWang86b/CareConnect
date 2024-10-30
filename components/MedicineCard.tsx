@@ -8,7 +8,7 @@ import {
   ScrollView,
   TextInput,
 } from "react-native";
-import { fetchAPI, useFetch } from "@/lib/fetch";
+import { fetchAPI } from "@/lib/fetch";
 import { useUser } from "@clerk/clerk-expo";
 import DateTimePickerModal from "react-native-modal-datetime-picker";
 import { format } from "date-fns";
@@ -101,26 +101,6 @@ const MedicineCard = ({ item, refetch }: MedicineCardProps) => {
       console.log("Success:", result);
     } catch {}
   };
-
-  // const handleEdit = async () => {
-  //   try {
-  //     const response = await fetchAPI("/(api)/(myMedicine)/edit", {
-  //       method: "PUT",
-  //       headers: { "Content-Type": "application/json" },
-  //       body: JSON.stringify(editedItem),
-  //     });
-  //     refetch();
-  //     if (!response.ok) {
-  //       const errorBody = await response.text();
-  //       console.error("Error response:", errorBody);
-  //     }
-  //     const result = await response.json();
-  //     console.log("Edit success:", result);
-  //     setMedicineModalVisible(false);
-  //   } catch (error) {
-  //     console.error("Error editing medicine:", error);
-  //   }
-  // };
 
   const handleEdit = async (data: any) => {
     const updatedMedicine = {
