@@ -7,7 +7,7 @@ const getThisWeek = () => {
   const today = new Date();
   const days = [];
   // Generating 3 days before and 3 days after today
-  for (let i = -3; i <= 3; i++) {
+  for (let i = -15; i <= 15; i++) {
     const date = addDays(today, i);
     days.push({
       date,
@@ -21,7 +21,7 @@ const getThisWeek = () => {
 const DateList = () => {
   const dates = getThisWeek();
   const [dateSelected, setDateSelected] = useState<Date>(
-    dates.find((day) => day.isToday)?.date || new Date()
+    dates.find((day) => day.isToday)?.date || new Date(),
   );
   // console.log("dateSelected", dateSelected);
   const { dateList, setDateList, userSelectedDate, setUserSelectedDate } =
@@ -60,20 +60,33 @@ const DateList = () => {
               : "bg-white"
           }`}
         >
-          <View className="w-10">
-            <Text className="text-lg text-gray-800 text-center">
-              {item.formattedDate.split(",")[0]}
-            </Text>
-            <Text className="text-lg text-gray-800 text-center">
-              {item.formattedDate.split(",")[1]}
-            </Text>
-          </View>
+          {item.isToday ? (
+            <View
+              style={{
+                width: 49,
+                height: 55,
+                justifyContent: "center",
+                alignItems: "center",
+              }}
+            >
+              <Text className="text-lg text-gray-800 text-center">Today</Text>
+            </View>
+          ) : (
+            <View className="w-10">
+              <Text className="text-lg text-gray-800 text-center">
+                {item.formattedDate.split(",")[0]}
+              </Text>
+              <Text className="text-lg text-gray-800 text-center">
+                {item.formattedDate.split(",")[1]}
+              </Text>
+            </View>
+          )}
         </TouchableOpacity>
       )}
-      initialScrollIndex={3} // Centering today's date in the list
+      initialScrollIndex={15} // Centering today's date in the list
       getItemLayout={(data, index) => ({
-        length: 150,
-        offset: 150 * index,
+        length: 80,
+        offset: 80 * index,
         index,
       })}
     />

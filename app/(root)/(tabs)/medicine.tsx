@@ -41,7 +41,7 @@ const schema = z
     path: ["end_date"], // This will assign the error to `end_date` field
   });
 
-interface Medicine {
+interface Medicines {
   name: string;
   description: string;
 }
@@ -60,8 +60,8 @@ const Medicine = () => {
   const [isEndDatePickerVisible, setEndDatePickerVisible] = useState(false);
 
   const [isOpen, setIsOpen] = useState(false);
-  const [medicines, setMedicines] = useState<Medicine[]>([]);
-  const [filteredMedicines, setFilteredMedicines] = useState<Medicine[]>([]);
+  const [medicines, setMedicines] = useState<Medicines[]>([]);
+  const [filteredMedicines, setFilteredMedicines] = useState<Medicines[]>([]);
   const [showDropdown, setShowDropdown] = useState(false);
 
   const toggleMenu = () => setIsOpen(!isOpen);
@@ -86,12 +86,8 @@ const Medicine = () => {
   useEffect(() => {
     const fetchMedicines = async () => {
       try {
-        const response = await fetchAPI("/(api)/(medicine)/get"); // 调整您的端点
-        // if (!response.ok) {
-        //   throw new Error("response was not ok");
-        // }
+        const response = await fetchAPI("/(api)/(medicine)/get");
         const data = await response;
-        // 处理获取的药品数据
         setMedicines(data.data);
         console.log("medicines", medicines);
       } catch (error) {
@@ -115,7 +111,7 @@ const Medicine = () => {
     setShowDropdown(results.length > 0);
   };
 
-  const selectMedicine = (medicine: Medicine) => {
+  const selectMedicine = (medicine: Medicines) => {
     setValue("medicineName", medicine.name);
     setValue("description", medicine.description);
     setShowDropdown(false);
@@ -137,7 +133,7 @@ const Medicine = () => {
     setTimePickerVisible(false);
   };
 
-  // Handle time picker confirmation
+  // Handle date picker confirmation
   const handleConfirmStartDate = (date: Date) => {
     const formattedTime = format(date, "yyyy-MM-dd");
     setStartDate(formattedTime);
@@ -146,7 +142,7 @@ const Medicine = () => {
     hideStartDatePicker();
   };
 
-  // Handle time picker confirmation
+  // Handle dated picker confirmation
   const handleConfirmEndDate = (date: Date) => {
     const formattedTime = format(date, "yyyy-MM-dd");
     setEndDate(formattedTime);

@@ -111,6 +111,13 @@ const MedicineCard = ({ item, refetch }: MedicineCardProps) => {
       const result = await response.json();
       console.log("Success:", result);
     } catch {}
+
+    setTakenModalVisible(false);
+  };
+
+  const cancelTaken = (index: number) => {
+    setTakenModalVisible(false);
+    handleToggleIsTaken(index);
   };
 
   const openTakenModal = (index: number) => {
@@ -281,7 +288,7 @@ const MedicineCard = ({ item, refetch }: MedicineCardProps) => {
               <View className="flex flex-row gap-2 justify-end mt-8">
                 <TouchableOpacity
                   className="p-3 flex flex-row justify-center items-center rounded-lg"
-                  onPress={() => setTakenModalVisible(false)}
+                  onPress={() => cancelTaken(selectedTimeIndex)}
                 >
                   <Text>No</Text>
                 </TouchableOpacity>
