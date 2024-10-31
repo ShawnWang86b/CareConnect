@@ -1,4 +1,3 @@
-import React from "react";
 import { View, Text, TouchableOpacity, Image, StyleSheet } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useAuth, useUser } from "@clerk/clerk-expo";
@@ -14,30 +13,39 @@ const Profile = () => {
   };
 
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView>
       {/* Avatar placeholder */}
-      <View style={styles.avatarContainer}>
-        <Image
-          source={require("@/assets/images/user_picture.png")} // Use default image from assets folder
-          style={styles.avatar}
-        />
+      <View className="flex-row justify-between items-center px-5 mt-5">
+        <Text className="text-xl capitalize font-JakartaExtraBold">
+          My Profile
+        </Text>
       </View>
-      
-      {/* Display username and email */}
-      <Text style={styles.username}>{user?.name || "Unknown Username"}</Text>
-      <Text style={styles.email}>{user?.emailAddresses[0]?.emailAddress || "Email not found"}</Text>
 
-      {/* Sign out button */}
-      <TouchableOpacity onPress={handleSignOut} style={styles.signOutButton}>
-        <Text style={styles.signOutText}>Sign Out</Text>
-      </TouchableOpacity>
+      <View style={styles.container}>
+        <View style={styles.avatarContainer}>
+          <Image
+            source={require("@/assets/images/user_picture.png")} // Use default image from assets folder
+            style={styles.avatar}
+          />
+        </View>
+        {/* Display username and email */}
+        <Text style={styles.username}>{user?.username || "Unknown"}</Text>
+        <Text style={styles.email}>
+          {user?.emailAddresses[0]?.emailAddress || "Email not found"}
+        </Text>
+
+        {/* Sign out button */}
+        <TouchableOpacity onPress={handleSignOut} style={styles.signOutButton}>
+          <Text style={styles.signOutText}>Sign Out</Text>
+        </TouchableOpacity>
+      </View>
     </SafeAreaView>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
+    marginTop: "10%",
     alignItems: "center",
     justifyContent: "center",
     backgroundColor: "#F3F4F6",

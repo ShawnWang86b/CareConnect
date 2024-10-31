@@ -32,6 +32,7 @@ const SignUp = () => {
       await signUp.create({
         emailAddress: form.email,
         password: form.password,
+        username: form.name,
       });
 
       await signUp.prepareEmailAddressVerification({ strategy: "email_code" });
@@ -100,6 +101,7 @@ const SignUp = () => {
             label="Name"
             placeholder="Enter name"
             icon={icons.person}
+            textContentType="username"
             value={form.name}
             onChangeText={(value) => setForm({ ...form, name: value })}
           />
