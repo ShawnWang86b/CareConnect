@@ -37,7 +37,7 @@ const DateList = () => {
     //   .split("T")[0]
     //   .split("/")
     //   .join("-");
-    const formatDate = format(dateSelected, "MM-dd-yyyy");
+    const formatDate = format(dateSelected, "yyyy-MM-dd");
     setUserSelectedDate(formatDate);
   }, [dateSelected]);
 

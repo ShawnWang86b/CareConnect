@@ -68,6 +68,9 @@ const MedicineCard = ({ item, refetch }: MedicineCardProps) => {
   const [isEndDatePickerVisible, setEndDatePickerVisible] = useState(false);
   const [isTimePickerVisible, setTimePickerVisible] = useState(false);
 
+  const [takenModalVisible, setTakenModalVisible] = useState(false);
+  const [selectedTimeIndex, setSelectedTimeIndex] = useState(-1);
+
   const {
     control,
     handleSubmit,
@@ -108,6 +111,11 @@ const MedicineCard = ({ item, refetch }: MedicineCardProps) => {
       const result = await response.json();
       console.log("Success:", result);
     } catch {}
+  };
+
+  const openTakenModal = (index: number) => {
+    setTakenModalVisible(true);
+    setSelectedTimeIndex(index);
   };
 
   const handleEdit = async (data: any) => {
@@ -190,7 +198,6 @@ const MedicineCard = ({ item, refetch }: MedicineCardProps) => {
 
   // Handle time picker confirmation
   const handleConfirmTime = (time: Date) => {
-    // const formattedTime = format(time, "yyyy-MM-dd h:mm a");
     const formattedTime = format(time, " h:mm a");
     setEditedTimes((prevTimes) => [...prevTimes, formattedTime]);
     //@ts-ignore
@@ -200,7 +207,7 @@ const MedicineCard = ({ item, refetch }: MedicineCardProps) => {
 
   // Handle time picker confirmation
   const handleConfirmStartDate = (date: Date) => {
-    const formattedTime = format(date, "MM-dd-yyyy");
+    const formattedTime = format(date, "yyyy-MM-dd");
     setEditedStartDate(formattedTime);
     //@ts-ignore
     setValue("editedStartDate", formattedTime); // update form state
@@ -209,7 +216,7 @@ const MedicineCard = ({ item, refetch }: MedicineCardProps) => {
 
   // Handle time picker confirmation
   const handleConfirmEndDate = (date: Date) => {
-    const formattedTime = format(date, "MM-dd-yyyy");
+    const formattedTime = format(date, "yyyy-MM-dd");
     setEditedEndDate(formattedTime);
     //@ts-ignore
     setValue("editedEndDate", formattedTime); // update form state
@@ -228,19 +235,19 @@ const MedicineCard = ({ item, refetch }: MedicineCardProps) => {
   const hideEndDatePicker = () => setEndDatePickerVisible(false);
 
   return (
-    <View className="w-[330px] flex justify-center bg-slate-100 rounded-lg mb-3 px-4 mx-4">
+    <View className="w-[330px] flex justify-center bg-slate-100 rounded-lg mb-4 px-4 mx-4">
       <Text className="text-lg font-JakartaBold mt-2">
         Medicine: {item.name}
       </Text>
-      <View className="flex justify-start mb-4">
-        <Text>description: {item.description}</Text>
+      <View className="flex justify-start mb-2 mt-1">
+        <Text>Description: {item.description}</Text>
       </View>
 
       <FlatList
         data={item.time}
         keyExtractor={(timeItem, index) => index.toString()}
         renderItem={({ item: timeItem, index }) => (
-          <TouchableOpacity onPress={() => handleToggleIsTaken(index)}>
+          <TouchableOpacity onPress={() => openTakenModal(index)}>
             <View
               className={`rounded-md p-2 mr-2 mb-4 ${
                 timeItem.isTaken ? "bg-green-500" : "bg-sky-500"
@@ -252,6 +259,43 @@ const MedicineCard = ({ item, refetch }: MedicineCardProps) => {
         )}
         horizontal
       />
+
+      {/* taken modal */}
+      <Modal visible={takenModalVisible} transparent={true} animationType="fade">
+        <TouchableOpacity
+          activeOpacity={1}
+          onPress={() => setTakenModalVisible(false)}
+          className="flex justify-center items-center flex-1 bg-black"
+          style={{ backgroundColor: "rgba(0,0,0,0.5)" }}
+        >
+          <TouchableOpacity
+            activeOpacity={1}
+            onPress={() => {}}
+            className="w-[90%] bg-white p-5 rounded-md"
+          >
+            <ScrollView className="h-[140px]">
+              {/* Add your content here */}
+              <Text className="text-xl font-JakartaExtraBold">
+                Have you taken the medicine at this time?
+              </Text>
+              <View className="flex flex-row gap-2 justify-end mt-8">
+                <TouchableOpacity
+                  className="p-3 flex flex-row justify-center items-center rounded-lg"
+                  onPress={() => setTakenModalVisible(false)}
+                >
+                  <Text>No</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  className="p-3 flex flex-row justify-center items-center rounded-lg  bg-red-500"
+                  onPress={() => handleToggleIsTaken(selectedTimeIndex)}
+                >
+                  <Text className="text-white font-JakartaBold">Yes</Text>
+                </TouchableOpacity>
+              </View>
+            </ScrollView>
+          </TouchableOpacity>
+        </TouchableOpacity>
+      </Modal>
 
       {/* edit and delte button */}
       <View className="flex flex-row gap-2 mb-2">

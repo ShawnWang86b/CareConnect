@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import DateList from "@/components/DateList";
 import { Ionicons } from "@expo/vector-icons";
 import {
@@ -41,6 +41,11 @@ const schema = z
     path: ["end_date"], // This will assign the error to `end_date` field
   });
 
+interface Medicine {
+  name: string;
+  description: string;
+}
+
 const Medicine = () => {
   const { user } = useUser();
   const userId = user?.id;
@@ -55,6 +60,9 @@ const Medicine = () => {
   const [isEndDatePickerVisible, setEndDatePickerVisible] = useState(false);
 
   const [isOpen, setIsOpen] = useState(false);
+  const [medicines, setMedicines] = useState<Medicine[]>([]);
+  const [filteredMedicines, setFilteredMedicines] = useState<Medicine[]>([]);
+  const [showDropdown, setShowDropdown] = useState(false);
 
   const toggleMenu = () => setIsOpen(!isOpen);
 
@@ -74,6 +82,45 @@ const Medicine = () => {
     },
   });
 
+  // fetch medicines
+  useEffect(() => {
+    const fetchMedicines = async () => {
+      try {
+        const response = await fetchAPI("/(api)/(medicine)/get"); // 调整您的端点
+        // if (!response.ok) {
+        //   throw new Error("response was not ok");
+        // }
+        const data = await response;
+        // 处理获取的药品数据
+        setMedicines(data.data);
+        console.log("medicines", medicines);
+      } catch (error) {
+        console.error("Error fetching medicines:", error);
+      }
+    };
+    fetchMedicines();
+  }, []);
+
+  const filterMedicines = (input: string) => {
+    if (input.trim() === "") {
+      setShowDropdown(false); // if input is empty, then hide the dropdown
+      return;
+    }
+    const results = medicines
+      .filter((medicine) =>
+        medicine.name.toLowerCase().includes(input.toLowerCase()),
+      )
+      .sort((a, b) => a.name.localeCompare(b.name)); // Sort results alphabetically
+    setFilteredMedicines(results);
+    setShowDropdown(results.length > 0);
+  };
+
+  const selectMedicine = (medicine: Medicine) => {
+    setValue("medicineName", medicine.name);
+    setValue("description", medicine.description);
+    setShowDropdown(false);
+  };
+
   // fetch data
   const { data, loading, error, refetch } = useFetch<any[]>(
     `/(api)/(myMedicine)/${userId}/${userSelectedDate}`,
@@ -92,7 +139,7 @@ const Medicine = () => {
 
   // Handle time picker confirmation
   const handleConfirmStartDate = (date: Date) => {
-    const formattedTime = format(date, "MM-dd-yyyy");
+    const formattedTime = format(date, "yyyy-MM-dd");
     setStartDate(formattedTime);
     //@ts-ignore
     setValue("start_date", formattedTime); // update form state
@@ -101,7 +148,7 @@ const Medicine = () => {
 
   // Handle time picker confirmation
   const handleConfirmEndDate = (date: Date) => {
-    const formattedTime = format(date, "MM-dd-yyyy");
+    const formattedTime = format(date, "yyyy-MM-dd");
     setEndDate(formattedTime);
     //@ts-ignore
     setValue("end_date", formattedTime); // update form state
@@ -128,6 +175,21 @@ const Medicine = () => {
     setValue("selectedTimes", updatedTimes); // update form state
   };
 
+  const clearInput = () => {
+    setValue("description", "");
+    setValue("medicineName", "");
+    setModalVisible(false);
+    setStartDate("");
+    setEndDate("");
+    setSelectedTimes([]); // clear selected times after submission
+  };
+
+  const handleCancle = () => {
+    setModalVisible(false);
+    clearInput();
+    setShowDropdown(false);
+  };
+
   // Handle form submission
   const onSubmit = async (data: any) => {
     const formattedTimes = selectedTimes.map((time) => ({
@@ -150,12 +212,8 @@ const Medicine = () => {
       });
       refetch();
 
-      setValue("description", "");
-      setValue("medicineName", "");
-      setModalVisible(false);
-      setStartDate("");
-      setEndDate("");
-      setSelectedTimes([]); // clear selected times after submission
+      clearInput();
+      setShowDropdown(false);
     } catch {}
   };
 
@@ -198,9 +256,6 @@ const Medicine = () => {
         <Text className="text-xl capitalize font-JakartaExtraBold">
           My medicine plan
         </Text>
-        {/* <Link href={`/(root)/medichistory/${userId}`} style={{ color: "#1E90FF" }}>
-          my medicines
-        </Link> */}
 
         <View>
           <TouchableOpacity onPress={toggleMenu}>
@@ -235,7 +290,7 @@ const Medicine = () => {
       <View className="my-4">
         <DateList />
       </View>
-      <View className="px-5">
+      <View className="px-5 pb-1">
         <Text className="text-xl font-JakartaExtraBold">
           {/* Today */}
           {userSelectedDate}'s Plan
@@ -268,7 +323,10 @@ const Medicine = () => {
                       placeholder="Medicine Name"
                       onBlur={onBlur}
                       value={value}
-                      onChangeText={onChange}
+                      onChangeText={(text) => {
+                        onChange(text);
+                        filterMedicines(text); // 更新过滤结果
+                      }}
                     />
                     {errors.medicineName && (
                       <Text className="text-red-500 mb-3">
@@ -278,6 +336,22 @@ const Medicine = () => {
                   </View>
                 )}
               />
+
+              {/* drop down show filtered medicines */}
+              {showDropdown && (
+                <FlatList
+                  data={filteredMedicines.slice(0, 5)}
+                  keyExtractor={(item) => item.name}
+                  renderItem={({ item }) => (
+                    <TouchableOpacity onPress={() => selectMedicine(item)}>
+                      <Text style={{ padding: 10, backgroundColor: "#f0f0f0" }}>
+                        {item.name}
+                      </Text>
+                    </TouchableOpacity>
+                  )}
+                  style={{ maxHeight: 150 }}
+                />
+              )}
 
               {/* Description */}
               <Controller
@@ -404,7 +478,7 @@ const Medicine = () => {
                 {/* Cancel button */}
                 <TouchableOpacity
                   className="bg-[#f44336] h-[50px] flex justify-center items-center rounded-md"
-                  onPress={() => setModalVisible(false)}
+                  onPress={() => handleCancle()}
                   style={{ flex: 1, marginRight: 5 }}
                 >
                   <Text style={{ color: "white", fontWeight: "bold" }}>
@@ -429,18 +503,19 @@ const Medicine = () => {
 
       {data && data.length > 0 ? (
         <FlatList
-          className="bg-white m-4 p-4"
+          className="bg-white mt-1 p-4 pt-4"
           data={data}
-          renderItem={({ item }) => (
-            <View style={{ marginTop: 5 }}>
+          keyExtractor={(item) => item.id.toString()}
+          renderItem={({ item, index }) => (
+            <View
+              style={{
+                marginBottom: index === data.length - 1 ? 20 : 0, // 最后一个卡片的 marginBottom 为 20
+              }}
+            >
               <MedicineCard item={item} refetch={refetch} />
             </View>
           )}
-          contentContainerStyle={{
-            justifyContent: "center",
-            alignItems: "center",
-            paddingTop: 5,
-          }}
+          style={{ height: "63%" }}
         />
       ) : (
         <View className="relative">
