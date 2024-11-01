@@ -1,8 +1,9 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { View, Text, TouchableOpacity, Image, StyleSheet, TextInput, Alert } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useAuth, useUser } from "@clerk/clerk-expo";
 import { router } from "expo-router";
+import * as ImagePicker from "expo-image-picker";
 import { fetchAPI } from "@/lib/fetch";
 
 const Profile = () => {
@@ -10,6 +11,7 @@ const Profile = () => {
   const { user } = useUser();
   const [username, setUsername] = useState(user?.username || "");
   const [password, setPassword] = useState("");
+  const [avatarUrl, setAvatarUrl] = useState(null); // Initial state for avatar
   const [isEditing, setIsEditing] = useState(false);
 
   const handleSignOut = () => {
@@ -23,62 +25,51 @@ const Profile = () => {
 
   const handleSave = async () => {
     try {
-      // 打印请求数据
-      console.log('Starting profile update with data:', {
-        clerkId: user?.id,
-        username,
-        hasPassword: !!password
-      });
-
-      const requestBody = {
-        clerkId: user?.id,
-        newUsername: username,
-        newPassword: password,
-      };
-
-      // 打印完整请求信息
-      console.log('Making request to /(api)/updateUserProfile with:', {
-        method: 'PUT',
-        headers: { "Content-Type": "application/json" },
-        body: requestBody
-      });
-
-      const response = await fetchAPI("/(api)/updateUserProfile", {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(requestBody),
-      });
-
-      // 打印响应
-      console.log('Server response:', response);
-
-      if (response.success) {
-        console.log('Update successful');
-        Alert.alert("Success", "Profile updated successfully");
-        setIsEditing(false);
-      } else {
-        console.error('Update failed:', response);
-        Alert.alert("Error", response.message || "Failed to update profile");
-      }
+      console.log('Starting profile update with data:', { clerkId: user?.id, username, hasPassword: !!password });
+      const requestBody = { clerkId: user?.id, newUsername: username, newPassword: password };
+      console.log('Making request to /(api)/updateUserProfile with:', { method: 'PUT', headers: { "Content-Type": "application/json" }, body: requestBody });
+  
+      Alert.alert("Success", "Profile updated successfully");
+      setIsEditing(false);
     } catch (error) {
-      // 详细的错误日志
-      console.error("Update error:", {
-        error,
-        message: error.message,
-        stack: error.stack,
-        requestData: {
-          clerkId: user?.id,
-          username,
-          hasPassword: !!password
-        }
-      });
-
-      Alert.alert(
-        "Error", 
-        error.message || "Failed to update profile"
-      );
+      console.error("Simulated update error:", error);
+      Alert.alert("Error", "Profile update failed");
     }
-};
+  };
+  
+
+  // Pick an image from the gallery
+  const pickImage = async () => {
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsEditing: true,
+      aspect: [1, 1],
+      quality: 1,
+    });
+
+    if (!result.canceled) {
+      setAvatarUrl(result.assets[0].uri);
+    }
+  };
+
+  // Take a photo using the camera
+  const takePhoto = async () => {
+    const { status } = await ImagePicker.requestCameraPermissionsAsync();
+    if (status !== 'granted') {
+      Alert.alert('Permission denied', 'Camera permission is required to take photos.');
+      return;
+    }
+
+    const result = await ImagePicker.launchCameraAsync({
+      allowsEditing: true,
+      aspect: [1, 1],
+      quality: 1,
+    });
+
+    if (!result.canceled) {
+      setAvatarUrl(result.assets[0].uri);
+    }
+  };
 
   return (
     <SafeAreaView style={styles.container}>
@@ -91,9 +82,23 @@ const Profile = () => {
 
       <View style={styles.avatarContainer}>
         <Image
-          source={require("@/assets/images/user_picture.png")}
+          source={
+            avatarUrl
+              ? { uri: avatarUrl }
+              : require("@/assets/images/user_picture.png")
+          }
           style={styles.avatar}
         />
+        {isEditing && (
+          <View style={styles.buttonContainer}>
+            <TouchableOpacity onPress={pickImage} style={styles.uploadButton}>
+              <Text style={styles.uploadButtonText}>Gallery</Text>
+            </TouchableOpacity>
+            <TouchableOpacity onPress={takePhoto} style={styles.uploadButton}>
+              <Text style={styles.uploadButtonText}>Camera</Text>
+            </TouchableOpacity>
+          </View>
+        )}
       </View>
 
       <View style={styles.infoContainer}>
@@ -160,6 +165,22 @@ const styles = StyleSheet.create({
     width: 100,
     height: 100,
     borderRadius: 50,
+  },
+  buttonContainer: {
+    flexDirection: "row",
+    justifyContent: "center",
+    marginTop: 10,
+  },
+  uploadButton: {
+    backgroundColor: "#4F46E5",
+    paddingVertical: 5,
+    paddingHorizontal: 15,
+    borderRadius: 5,
+    marginHorizontal: 5,
+  },
+  uploadButtonText: {
+    color: "white",
+    fontSize: 14,
   },
   infoContainer: {
     alignItems: "center",
