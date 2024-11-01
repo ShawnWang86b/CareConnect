@@ -18,7 +18,16 @@ export async function PUT(request: Request) {
     } = body; // Add your necessary medicine fields
 
     // Ensure all required fields are present
-    if (!id || !name || !description || !start_date || !end_date || !time || !dates_times || !user_id) {
+    if (
+      !id ||
+      !name ||
+      !description ||
+      !start_date ||
+      !end_date ||
+      !time ||
+      !dates_times ||
+      !user_id
+    ) {
       return new Response(
         JSON.stringify({ error: "Missing required fields" }),
         {

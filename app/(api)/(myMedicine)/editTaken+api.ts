@@ -5,7 +5,16 @@ export async function PUT(request: Request) {
     const sql = neon(`${process.env.DATABASE_URL}`);
 
     const body = await request.json();
-    const { id, name, description, start_date, end_date, time, dates_times, user_id } = body;
+    const {
+      id,
+      name,
+      description,
+      start_date,
+      end_date,
+      time,
+      dates_times,
+      user_id,
+    } = body;
     console.log("body.id", body.id);
     console.log("body.name", body.name);
     console.log("body.description", body.description);
