@@ -15,6 +15,7 @@ import { format } from "date-fns";
 import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
+import { useDateList } from "@/store";
 
 type MedicineCardProps = {
   item: itemProps;
@@ -29,6 +30,11 @@ type itemProps = {
   start_date: string;
   end_date: string;
   time: { timeSlot: string; isTaken: boolean }[];
+  dates_times: {
+    date: string;
+    timeSlot: string;
+    isTaken: boolean;
+  }[];
   user_id: string;
 };
 
@@ -69,7 +75,8 @@ const MedicineCard = ({ item, refetch }: MedicineCardProps) => {
   const [isTimePickerVisible, setTimePickerVisible] = useState(false);
 
   const [takenModalVisible, setTakenModalVisible] = useState(false);
-  const [selectedTimeIndex, setSelectedTimeIndex] = useState(-1);
+  const [selectedTime, setSelectedTime] = useState("");
+  const { userSelectedDate } = useDateList();
 
   const {
     control,
@@ -87,12 +94,14 @@ const MedicineCard = ({ item, refetch }: MedicineCardProps) => {
     },
   });
 
-  const handleToggleIsTaken = async (index: number) => {
+  const handleToggleIsTaken = async (taken: boolean) => {
     let updatedItem = { ...item };
     updatedItem = {
       ...item,
-      time: item.time.map((timeSlot, i) =>
-        i === index ? { ...timeSlot, isTaken: !timeSlot.isTaken } : timeSlot,
+      dates_times: item.dates_times.map((dateTime) =>
+        dateTime.date === userSelectedDate && dateTime.timeSlot === selectedTime
+          ? { ...dateTime, isTaken: taken }
+          : dateTime,
       ),
     };
     console.log("updatedItem", updatedItem);
@@ -115,36 +124,57 @@ const MedicineCard = ({ item, refetch }: MedicineCardProps) => {
     setTakenModalVisible(false);
   };
 
-  const cancelTaken = (index: number) => {
+  const cancelTaken = (taken: boolean) => {
     setTakenModalVisible(false);
-    handleToggleIsTaken(index);
+    handleToggleIsTaken(taken);
   };
 
-  const openTakenModal = (index: number) => {
+  const openTakenModal = (time: string) => {
     setTakenModalVisible(true);
-    setSelectedTimeIndex(index);
+    setSelectedTime(time);
   };
 
   const handleEdit = async (data: any) => {
-    const existingTimes = item.time; // This should contain the existing time slots
-    const editedTimeSlots = new Set(editedTimes); // Set of edited time slots
+    const formattedTimes = editedTimes.map((time) => ({
+      timeSlot: time.trim(), // Remove any leading/trailing spaces
+      isTaken: false,
+    }));
 
-    // Filter out existing times not present in editedTimes
-    const retainedExistingTimes = existingTimes.filter((existing) =>
-      editedTimeSlots.has(existing.timeSlot),
+    // generate all dates from start_date to end_date
+    const generateDateRange = (startDate: Date, endDate: Date) => {
+      const dates = [];
+      let currentDate = new Date(startDate);
+      while (currentDate <= endDate) {
+        dates.push(new Date(currentDate));
+        currentDate.setDate(currentDate.getDate() + 1);
+      }
+      return dates;
+    };
+    // the generated date range
+    const dateRange = generateDateRange(
+      new Date(editedStartDate),
+      new Date(editedEndDate),
     );
 
-    // Map edited times to create updated times array with new slots set to isTaken: false
-    const updatedTimes = editedTimes.map((timeSlot) => {
-      const existingTime = retainedExistingTimes.find((time) => time.timeSlot === timeSlot);
-      return {
-        timeSlot: timeSlot.trim(),
-        isTaken: existingTime ? existingTime.isTaken : false, // Retain existing isTaken if present, else set to false
-      };
-    });
+    // combine all dates and all times
+    const datesTimes: { date: string; timeSlot: string; isTaken: boolean }[] =
+      [];
+    dateRange.forEach((date) => {
+      editedTimes.forEach((time) => {
+        const formattedDate = date.toISOString().split("T")[0]; // "yyyy-MM-dd"
+        // Check if the combination of date and timeSlot exists in item.dates_times
+        const existingEntry = item.dates_times.find(
+          (entry) =>
+            entry.date === formattedDate && entry.timeSlot === time.trim(),
+        );
 
-    // Final array with removed slots excluded
-    const finalTimes = [...updatedTimes];
+        datesTimes.push({
+          date: formattedDate,
+          timeSlot: time.trim(),
+          isTaken: existingEntry ? existingEntry.isTaken : false, // Use existing isTaken value if exists
+        });
+      });
+    });
 
     const updatedMedicine = {
       id: item.id,
@@ -152,8 +182,9 @@ const MedicineCard = ({ item, refetch }: MedicineCardProps) => {
       description: data.editedDscp,
       start_date: editedStartDate,
       end_date: editedEndDate,
-      time: finalTimes,
+      time: formattedTimes,
       // time: editedTimes.map((timeSlot) => ({ timeSlot, isTaken: false })),
+      dates_times: datesTimes,
       user_id: userId,
     };
 
@@ -163,6 +194,7 @@ const MedicineCard = ({ item, refetch }: MedicineCardProps) => {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(updatedMedicine),
       });
+      console.log(response);
       refetch();
       setEditModalVisible(false); // Close the modal
     } catch (error) {
@@ -251,10 +283,12 @@ const MedicineCard = ({ item, refetch }: MedicineCardProps) => {
       </View>
 
       <FlatList
-        data={item.time}
+        data={item.dates_times.filter(
+          (timeItem) => timeItem.date === userSelectedDate,
+        )}
         keyExtractor={(timeItem, index) => index.toString()}
-        renderItem={({ item: timeItem, index }) => (
-          <TouchableOpacity onPress={() => openTakenModal(index)}>
+        renderItem={({ item: timeItem }) => (
+          <TouchableOpacity onPress={() => openTakenModal(timeItem.timeSlot)}>
             <View
               className={`rounded-md p-2 mr-2 mb-4 ${
                 timeItem.isTaken ? "bg-green-500" : "bg-sky-500"
@@ -288,13 +322,13 @@ const MedicineCard = ({ item, refetch }: MedicineCardProps) => {
               <View className="flex flex-row gap-2 justify-end mt-8">
                 <TouchableOpacity
                   className="p-3 flex flex-row justify-center items-center rounded-lg"
-                  onPress={() => cancelTaken(selectedTimeIndex)}
+                  onPress={() => cancelTaken(false)}
                 >
                   <Text>No</Text>
                 </TouchableOpacity>
                 <TouchableOpacity
                   className="p-3 flex flex-row justify-center items-center rounded-lg  bg-red-500"
-                  onPress={() => handleToggleIsTaken(selectedTimeIndex)}
+                  onPress={() => handleToggleIsTaken(true)}
                 >
                   <Text className="text-white font-JakartaBold">Yes</Text>
                 </TouchableOpacity>

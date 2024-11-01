@@ -79,6 +79,7 @@ const Medicine = () => {
       start_date: "",
       end_date: "",
       selectedTimes: [],
+      dates_times: [],
     },
   });
 
@@ -193,6 +194,36 @@ const Medicine = () => {
       isTaken: false,
     }));
 
+    // generate all dates from start_date to end_date
+    const generateDateRange = (startDate: Date, endDate: Date) => {
+      const dates = [];
+      let currentDate = new Date(startDate);
+      while (currentDate <= endDate) {
+        dates.push(new Date(currentDate)); // 将当前日期添加到数组
+        currentDate.setDate(currentDate.getDate() + 1); // 增加一天
+      }
+      return dates;
+    };
+    // the generated date range
+    const dateRange = generateDateRange(
+      new Date(start_date),
+      new Date(end_date),
+    );
+
+    // combine all dates and all times
+    const datesTimes: { date: string; timeSlot: string; isTaken: boolean }[] =
+      [];
+    dateRange.forEach((date) => {
+      selectedTimes.forEach((time) => {
+        const formattedDate = date.toISOString().split("T")[0]; // "yyyy-MM-dd"
+        datesTimes.push({
+          date: formattedDate,
+          timeSlot: time.trim(),
+          isTaken: false,
+        });
+      });
+    });
+
     try {
       const { response } = await fetchAPI("/(api)/(myMedicine)/create", {
         method: "POST",
@@ -203,9 +234,11 @@ const Medicine = () => {
           start_date: start_date,
           end_date: end_date,
           time: formattedTimes,
+          dates_times: datesTimes,
           user_id: userId,
         }),
       });
+      console.log("datesTimes:", datesTimes);
       refetch();
 
       clearInput();

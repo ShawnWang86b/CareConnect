@@ -5,13 +5,14 @@ export async function PUT(request: Request) {
     const sql = neon(`${process.env.DATABASE_URL}`);
 
     const body = await request.json();
-    const { id, name, description, start_date, end_date, time, user_id } = body;
+    const { id, name, description, start_date, end_date, time, dates_times, user_id } = body;
     console.log("body.id", body.id);
     console.log("body.name", body.name);
     console.log("body.description", body.description);
     console.log("body.start_date", body.start_date);
     console.log("body.end_date", body.end_date);
     console.log("body.time", body.time);
+    console.log("body.dates_times", body.dates_times);
     console.log("body.user_id", body.user_id);
     // Ensure all required fields are present
     // if (!id || !name || !description || !day || !time || user_id) {
@@ -23,18 +24,18 @@ export async function PUT(request: Request) {
     //   );
     // }
 
-    const response111 = `
-    UPDATE my_medicine
-    SET name = ${name}, description = ${description},start_date = ${start_date},end_date=${end_date},time = ${JSON.stringify(time)}
-    WHERE id = ${id} AND user_id = ${user_id}
-    RETURNING *;
-  `;
-    console.log("response111", response111);
-    // Update the medicine for the logged-in user
+    //   const response111 = `
+    //   UPDATE my_medicine
+    //   SET name = ${name}, description = ${description},start_date = ${start_date},end_date=${end_date},time = ${JSON.stringify(time)},dates_times = ${JSON.stringify(dates_times)}
+    //   WHERE id = ${id} AND user_id = ${user_id}
+    //   RETURNING *;
+    // `;
+    //   console.log("response111", response111);
+    //   // Update the medicine for the logged-in user
 
     const response = await sql`
       UPDATE my_medicine
-      SET "name" = ${name}, "description" = ${description},start_date = ${start_date},end_date=${end_date},"time" = ${JSON.stringify(time)}
+      SET "name" = ${name}, "description" = ${description},start_date = ${start_date},end_date=${end_date},"time" = ${JSON.stringify(time)},"dates_times" = ${JSON.stringify(dates_times)}
       WHERE "id" = ${id} AND "user_id" = ${user_id}
       RETURNING *;
     `;

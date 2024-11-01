@@ -6,10 +6,19 @@ export async function PUT(request: Request) {
 
     const body = await request.json();
     // console.log("body", body);
-    const { id, name, description, start_date, end_date, time, user_id } = body; // Add your necessary medicine fields
+    const {
+      id,
+      name,
+      description,
+      start_date,
+      end_date,
+      time,
+      dates_times,
+      user_id,
+    } = body; // Add your necessary medicine fields
 
     // Ensure all required fields are present
-    if (!id || !name || !description || !start_date || !end_date || !time || !user_id) {
+    if (!id || !name || !description || !start_date || !end_date || !time || !dates_times || !user_id) {
       return new Response(
         JSON.stringify({ error: "Missing required fields" }),
         {
@@ -25,7 +34,8 @@ export async function PUT(request: Request) {
           description = ${description}, 
           start_date = ${start_date}, 
           end_date = ${end_date}, 
-          time = ${JSON.stringify(time)}
+          time = ${JSON.stringify(time)},
+          dates_times = ${JSON.stringify(dates_times)}
       WHERE id = ${id} AND user_id = ${user_id}
       RETURNING *;
     `;
