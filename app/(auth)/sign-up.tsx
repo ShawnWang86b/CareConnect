@@ -1,3 +1,5 @@
+// signup.tsx
+
 import { View, Text, ScrollView, Image, Alert } from "react-native";
 import { Link, router } from "expo-router";
 import InputField from "@/components/InputField";
@@ -57,8 +59,9 @@ const SignUp = () => {
       });
 
       if (completeSignUp.status === "complete") {
-        await fetchAPI("/(api)/user", {
+        await fetchAPI("/api/user", {
           method: "POST",
+          headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
             name: form.name,
             email: form.email,
@@ -81,7 +84,7 @@ const SignUp = () => {
     } catch (err: any) {
       setVerification({
         ...verification,
-        error: err.errors[0].longMessage,
+        error: err.message,
         state: "failed",
       });
     }

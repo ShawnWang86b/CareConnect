@@ -1,78 +1,157 @@
-import { View, Text, TouchableOpacity, Image, StyleSheet } from "react-native";
+import React, { useEffect, useState } from "react";
+import { View, Text, TouchableOpacity, Image, StyleSheet, TextInput, Alert } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useAuth, useUser } from "@clerk/clerk-expo";
 import { router } from "expo-router";
+import { fetchAPI } from "@/lib/fetch";
 
 const Profile = () => {
   const { signOut } = useAuth();
   const { user } = useUser();
+  const [username, setUsername] = useState(user?.username || "");
+  const [password, setPassword] = useState("");
+  const [isEditing, setIsEditing] = useState(false);
 
   const handleSignOut = () => {
     signOut();
-    router.replace("/(auth)/sign-in"); // Redirect to the login page after signing out
+    router.replace("/(auth)/sign-in");
+  };
+
+  const handleEdit = () => {
+    setIsEditing(true);
+  };
+
+  const handleSave = async () => {
+    try {
+      const response = await fetchAPI("/api/updateUserProfile", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          clerkId: user?.id,
+          newUsername: username,
+          newPassword: password,
+        }),
+      });
+
+      if (response.success) {
+        Alert.alert("Success", "Profile updated successfully");
+        setIsEditing(false);
+      } else {
+        Alert.alert("Error", "Failed to update profile");
+      }
+    } catch (error) {
+      Alert.alert("Error", "Failed to update profile");
+      console.error("Update error:", error);
+      console.log('Saving profile with data:', { clerkId: user?.id, username, hasPassword: !!password });
+      console.log('Server response:', response);
+      console.error('Error details:', { message: error.message, stack: error.stack, fullError: error });
+    }
   };
 
   return (
-    <SafeAreaView>
-      {/* Avatar placeholder */}
-      <View className="flex-row justify-between items-center px-5 mt-5">
-        <Text className="text-xl capitalize font-JakartaExtraBold">
-          My Profile
-        </Text>
+    <SafeAreaView style={styles.container}>
+      <View style={styles.header}>
+        <Text style={styles.title}>Profile</Text>
+        <TouchableOpacity onPress={isEditing ? handleSave : handleEdit}>
+          <Text style={styles.editText}>{isEditing ? "Done" : "Edit"}</Text>
+        </TouchableOpacity>
       </View>
 
-      <View style={styles.container}>
-        <View style={styles.avatarContainer}>
-          <Image
-            source={require("@/assets/images/user_picture.png")} // Use default image from assets folder
-            style={styles.avatar}
+      <View style={styles.avatarContainer}>
+        <Image
+          source={require("@/assets/images/user_picture.png")}
+          style={styles.avatar}
+        />
+      </View>
+
+      <View style={styles.infoContainer}>
+        {isEditing ? (
+          <TextInput
+            style={styles.input}
+            value={username}
+            onChangeText={setUsername}
+            placeholder="Username"
           />
-        </View>
-        {/* Display username and email */}
-        <Text style={styles.username}>{user?.username || "Unknown"}</Text>
-        <Text style={styles.email}>
+        ) : (
+          <Text style={styles.infoText}>{username || "Unknown Username"}</Text>
+        )}
+
+        <Text style={styles.emailText}>
           {user?.emailAddresses[0]?.emailAddress || "Email not found"}
         </Text>
 
-        {/* Sign out button */}
-        <TouchableOpacity onPress={handleSignOut} style={styles.signOutButton}>
-          <Text style={styles.signOutText}>Sign Out</Text>
-        </TouchableOpacity>
+        {isEditing && (
+          <TextInput
+            style={styles.input}
+            secureTextEntry
+            value={password}
+            onChangeText={setPassword}
+            placeholder="New Password"
+          />
+        )}
       </View>
+
+      <TouchableOpacity onPress={handleSignOut} style={styles.signOutButton}>
+        <Text style={styles.signOutText}>Log Out</Text>
+      </TouchableOpacity>
     </SafeAreaView>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
-    marginTop: "10%",
-    alignItems: "center",
-    justifyContent: "center",
+    flex: 1,
     backgroundColor: "#F3F4F6",
   },
+  header: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    paddingHorizontal: 20,
+    paddingVertical: 10,
+    borderBottomWidth: 1,
+    borderBottomColor: "#E5E7EB",
+  },
+  title: {
+    fontSize: 24,
+    fontWeight: "bold",
+  },
+  editText: {
+    fontSize: 18,
+    color: "#4F46E5",
+  },
   avatarContainer: {
-    marginBottom: 20,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
-    shadowRadius: 6,
+    alignItems: "center",
+    marginTop: 20,
   },
   avatar: {
     width: 100,
     height: 100,
     borderRadius: 50,
-    borderWidth: 3,
-    borderColor: "#4F46E5",
   },
-  username: {
+  infoContainer: {
+    alignItems: "center",
+    marginTop: 20,
+  },
+  input: {
+    width: "80%",
+    fontSize: 18,
+    paddingVertical: 5,
+    paddingHorizontal: 10,
+    marginVertical: 10,
+    borderBottomWidth: 1,
+    borderBottomColor: "#4F46E5",
+  },
+  infoText: {
     fontSize: 20,
     fontWeight: "bold",
     color: "#111827",
     marginBottom: 5,
   },
-  email: {
+  emailText: {
     fontSize: 16,
     color: "#6B7280",
+    marginVertical: 5,
   },
   signOutButton: {
     marginTop: 30,
@@ -80,11 +159,7 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     paddingHorizontal: 20,
     borderRadius: 5,
-    shadowColor: "#EF4444",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.25,
-    shadowRadius: 3.5,
-    elevation: 5,
+    alignSelf: "center",
   },
   signOutText: {
     color: "white",
