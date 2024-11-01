@@ -23,30 +23,62 @@ const Profile = () => {
 
   const handleSave = async () => {
     try {
-      const response = await fetchAPI("/api/updateUserProfile", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          clerkId: user?.id,
-          newUsername: username,
-          newPassword: password,
-        }),
+      // 打印请求数据
+      console.log('Starting profile update with data:', {
+        clerkId: user?.id,
+        username,
+        hasPassword: !!password
       });
 
+      const requestBody = {
+        clerkId: user?.id,
+        newUsername: username,
+        newPassword: password,
+      };
+
+      // 打印完整请求信息
+      console.log('Making request to /(api)/updateUserProfile with:', {
+        method: 'PUT',
+        headers: { "Content-Type": "application/json" },
+        body: requestBody
+      });
+
+      const response = await fetchAPI("/(api)/updateUserProfile", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(requestBody),
+      });
+
+      // 打印响应
+      console.log('Server response:', response);
+
       if (response.success) {
+        console.log('Update successful');
         Alert.alert("Success", "Profile updated successfully");
         setIsEditing(false);
       } else {
-        Alert.alert("Error", "Failed to update profile");
+        console.error('Update failed:', response);
+        Alert.alert("Error", response.message || "Failed to update profile");
       }
     } catch (error) {
-      Alert.alert("Error", "Failed to update profile");
-      console.error("Update error:", error);
-      console.log('Saving profile with data:', { clerkId: user?.id, username, hasPassword: !!password });
-      console.log('Server response:', response);
-      console.error('Error details:', { message: error.message, stack: error.stack, fullError: error });
+      // 详细的错误日志
+      console.error("Update error:", {
+        error,
+        message: error.message,
+        stack: error.stack,
+        requestData: {
+          clerkId: user?.id,
+          username,
+          hasPassword: !!password
+        }
+      });
+
+      Alert.alert(
+        "Error", 
+        error.message || "Failed to update profile"
+      );
     }
-  };
+};
 
   return (
     <SafeAreaView style={styles.container}>
