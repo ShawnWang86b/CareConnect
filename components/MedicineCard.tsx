@@ -16,6 +16,7 @@ import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useDateList } from "@/store";
+import { handleScheduleNotification } from "./NotificationHelper";
 
 type MedicineCardProps = {
   item: itemProps;
@@ -176,6 +177,20 @@ const MedicineCard = ({ item, refetch }: MedicineCardProps) => {
       });
     });
 
+    // Check for differences between editedTimes and datesTimes
+    const newTimes: { date: string; timeSlot: string; isTaken: boolean }[] = [];
+
+    datesTimes.forEach(({ date, timeSlot }) => {
+      // Check if the timeSlot exists in editedTimes
+      const timeExists = editedTimes.some(
+        (editedTime) => editedTime.trim() === timeSlot.trim(),
+      );
+      // If it doesn't exist in editedTimes, add to newEntries
+      if (!timeExists) {
+        newTimes.push({ date, timeSlot, isTaken: false });
+      }
+    });
+
     const updatedMedicine = {
       id: item.id,
       name: data.editedMedName, // Get these from the form state
@@ -194,8 +209,10 @@ const MedicineCard = ({ item, refetch }: MedicineCardProps) => {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(updatedMedicine),
       });
+      console.log("test3:", newTimes);
       console.log(response);
       refetch();
+      handleScheduleNotification(datesTimes);
       setEditModalVisible(false); // Close the modal
     } catch (error) {
       console.error("Error editing medicine:", error);

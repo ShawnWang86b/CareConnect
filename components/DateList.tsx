@@ -6,7 +6,7 @@ import { useDateList } from "@/store";
 const getThisWeek = () => {
   const today = new Date();
   const days = [];
-  // Generating 3 days before and 3 days after today
+  // Generating 15 days before and 15 days after today
   for (let i = -15; i <= 15; i++) {
     const date = addDays(today, i);
     days.push({
@@ -63,7 +63,7 @@ const DateList = () => {
           {item.isToday ? (
             <View
               style={{
-                width: 49,
+                width: 50,
                 height: 55,
                 justifyContent: "center",
                 alignItems: "center",

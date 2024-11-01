@@ -11,6 +11,7 @@ import {
   FlatList,
   Image,
   StyleSheet,
+  Alert,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import DateTimePickerModal from "react-native-modal-datetime-picker";
@@ -24,6 +25,20 @@ import { useDateList } from "@/store";
 import MedicineCard from "@/components/MedicineCard";
 import { images } from "@/constants";
 import { Link } from "expo-router";
+import * as Notifications from "expo-notifications";
+import {
+  requestNotificationPermission,
+  handleScheduleNotification,
+} from "@/components/NotificationHelper";
+
+// Configure notification handler
+Notifications.setNotificationHandler({
+  handleNotification: async () => ({
+    shouldShowAlert: true,
+    shouldPlaySound: true,
+    shouldSetBadge: false,
+  }),
+});
 
 // Zod schema for form validation
 const schema = z
@@ -83,6 +98,11 @@ const Medicine = () => {
     },
   });
 
+  useEffect(() => {
+    // Request notification permission
+    requestNotificationPermission();
+  }, []);
+
   // fetch medicines
   useEffect(() => {
     const fetchMedicines = async () => {
@@ -127,7 +147,7 @@ const Medicine = () => {
   // Handle time picker confirmation
   const handleConfirmTime = (time: Date) => {
     // const formattedTime = format(time, "yyyy-MM-dd h:mm a");
-    const formattedTime = format(time, " h:mm a");
+    const formattedTime = format(time, "h:mm a");
     setSelectedTimes((prevTimes) => [...prevTimes, formattedTime]);
     //@ts-ignore
     setValue("selectedTimes", [...selectedTimes, formattedTime]); // update form state
@@ -199,8 +219,8 @@ const Medicine = () => {
       const dates = [];
       let currentDate = new Date(startDate);
       while (currentDate <= endDate) {
-        dates.push(new Date(currentDate)); // 将当前日期添加到数组
-        currentDate.setDate(currentDate.getDate() + 1); // 增加一天
+        dates.push(new Date(currentDate));
+        currentDate.setDate(currentDate.getDate() + 1);
       }
       return dates;
     };
@@ -240,7 +260,11 @@ const Medicine = () => {
       });
       console.log("datesTimes:", datesTimes);
       refetch();
-
+      handleScheduleNotification(datesTimes);
+      Alert.alert(
+        "Reminders Set!",
+        "You will receive notifications for your selected time(s).",
+      );
       clearInput();
       setShowDropdown(false);
     } catch {}
@@ -308,12 +332,6 @@ const Medicine = () => {
             </View>
           )}
         </View>
-        {/* <TouchableOpacity
-          onPress={handlePress}
-          className="justify-center items-center w-10 h-10 rounded-full bg-white"
-        >
-          <Ionicons name="menu-outline" size={24} color="black" />
-        </TouchableOpacity> */}
       </View>
 
       <View className="my-4">
@@ -354,7 +372,7 @@ const Medicine = () => {
                       value={value}
                       onChangeText={(text) => {
                         onChange(text);
-                        filterMedicines(text); // 更新过滤结果
+                        filterMedicines(text);
                       }}
                     />
                     {errors.medicineName && (
@@ -532,13 +550,13 @@ const Medicine = () => {
 
       {data && data.length > 0 ? (
         <FlatList
-          className="bg-white mt-1 p-4 pt-4"
+          className="bg-white mt-1 p-5 pt-4"
           data={data}
           keyExtractor={(item) => item.id.toString()}
           renderItem={({ item, index }) => (
             <View
               style={{
-                marginBottom: index === data.length - 1 ? 20 : 0, // 最后一个卡片的 marginBottom 为 20
+                marginBottom: index === data.length - 1 ? 20 : 0,
               }}
             >
               <MedicineCard item={item} refetch={refetch} />

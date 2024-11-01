@@ -17,7 +17,7 @@ const MedicHistoryPage = () => {
   async function fetchMyMedic() {
     const sql = neon(`${process.env.EXPO_PUBLIC_DATABASE}`);
     const res = await sql`SELECT * FROM "my_medicine" WHERE "user_id" = ${id}`;
-    console.log(res);
+    console.log("test:", res);
     setHistory(res);
   }
 
@@ -49,15 +49,18 @@ const MedicHistoryPage = () => {
             <FlatList
               className="bg-white m-4 p-4"
               data={history.filter((singlerecord) => {
-                const timeArray = singlerecord.end_date.split("-");
-                const endDate = timeArray[2] + timeArray[0] + timeArray[1];
+                // const timeArray = singlerecord.end_date.split("-");
+                // const endDate = timeArray[2] + timeArray[0] + timeArray[1];
                 var curDate = new Date();
-                const formatDate = format(curDate, "yyyyMMdd");
-                const startTimeArray = singlerecord.start_date.split("-");
-                const startDate =
-                  startTimeArray[2] + startTimeArray[0] + startTimeArray[1];
+                const formatDate = format(curDate, "yyyy-MM-dd");
+                // const startTimeArray = singlerecord.start_date.split("-");
+                // const startDate =
+                //   startTimeArray[2] + startTimeArray[0] + startTimeArray[1];
 
-                return formatDate <= endDate && formatDate >= startDate;
+                return (
+                  formatDate <= singlerecord.end_date &&
+                  formatDate >= singlerecord.start_date
+                );
               })}
               renderItem={({ item }) => (
                 <View style={{ marginTop: 5 }}>
@@ -81,11 +84,11 @@ const MedicHistoryPage = () => {
             <FlatList
               className="bg-white m-4 p-4"
               data={history.filter((singlerecord) => {
-                const timeArray = singlerecord.end_date.split("-");
-                const endDate = timeArray[2] + timeArray[0] + timeArray[1];
+                // const timeArray = singlerecord.end_date.split("-");
+                // const endDate = timeArray[2] + timeArray[0] + timeArray[1];
                 var curDate = new Date();
-                const formatDate = format(curDate, "yyyyMMdd");
-                return formatDate > endDate;
+                const formatDate = format(curDate, "yyyy-MM-dd");
+                return formatDate > singlerecord.end_date;
               })}
               renderItem={({ item }) => (
                 <View style={{ marginTop: 5 }}>
