@@ -3,7 +3,14 @@ import GoogleTextInput from "@/components/GoogleTextInput";
 import { icons, images } from "@/constants";
 import { useAuth, useUser } from "@clerk/clerk-expo";
 import { router } from "expo-router";
-import { Text, TouchableOpacity, View, Image, FlatList } from "react-native";
+import {
+  Text,
+  TouchableOpacity,
+  View,
+  Image,
+  FlatList,
+  ScrollView,
+} from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import Map from "@/components/Map";
 import { useLocationStore } from "@/store";
@@ -89,7 +96,38 @@ const Home = () => {
   return (
     <GestureHandlerRootView>
       <SafeAreaView className="flex-1 px-2">
-        {/* <FlatList
+        <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
+          <View className="flex flex-row items-center justify-between my-5">
+            <Text className="text-xl capitalize font-JakartaExtraBold">
+              Welcome{", "}
+              {user?.firstName ||
+                user?.emailAddresses[0].emailAddress.split("@")[0]}
+            </Text>
+            <TouchableOpacity
+              onPress={handleSignOut}
+              className="justify-center items-center w-10 h-10 rounded-full bg-white"
+            >
+              <Image source={icons.out} className="w-4 h-4" />
+            </TouchableOpacity>
+          </View>
+
+          <GoogleTextInput
+            icon={icons.search}
+            containerStyle="bg-white shadow-md shadow-neutral-300"
+            handlePress={handleDestinationPress}
+          />
+
+          <Text className="text-xl font-JakartaBold mt-5 mb-3">
+            Your Current Location
+          </Text>
+          <View className="flex flex-row items-center bg-transparent h-[300px]">
+            <Map setSelectedShop={setSelectedShop} />
+          </View>
+
+          <Text className="text-xl font-JakartaBold mt-5 mb-3">
+            Your Visit History
+          </Text>
+          {/* <FlatList
           data={data}
           renderItem={({ item }) => (
             <View>
@@ -98,76 +136,44 @@ const Home = () => {
           )}
           className="mt-4"
         /> */}
-        {sortedData && sortedData?.length > 0 ? (
-          <FlatList
-            data={sortedData}
-            renderItem={({ item }) => (
-              <View>
-                <HistoryCard item={item} />
-              </View>
-            )}
-            className="mt-4"
-            ListHeaderComponent={
-              <>
-                <View className="flex flex-row items-center justify-between my-5">
-                  <Text className="text-xl capitalize font-JakartaExtraBold">
-                    Welcome{", "}
-                    {user?.firstName ||
-                      user?.emailAddresses[0].emailAddress.split("@")[0]}
-                  </Text>
-                  <TouchableOpacity
-                    onPress={handleSignOut}
-                    className="justify-center items-center w-10 h-10 rounded-full bg-white"
-                  >
-                    <Image source={icons.out} className="w-4 h-4" />
-                  </TouchableOpacity>
+          {sortedData && sortedData?.length > 0 ? (
+            <FlatList
+              data={sortedData}
+              renderItem={({ item }) => (
+                <View>
+                  <HistoryCard item={item} />
                 </View>
+              )}
+              className="mt-4"
+              ListHeaderComponent={<></>}
+            />
+          ) : (
+            <View className="w-full flex justify-center items-center mt-4">
+              <Image source={images.noResult} className="w-[200px] h-[180px]" />
+            </View>
+          )}
 
-                <GoogleTextInput
-                  icon={icons.search}
-                  containerStyle="bg-white shadow-md shadow-neutral-300"
-                  handlePress={handleDestinationPress}
+          <BottomSheet
+            ref={bottomSheetRef}
+            snapPoints={["70%", "90%"]}
+            index={-1}
+            keyboardBehavior="extend"
+          >
+            {/* padding: 20  */}
+            <BottomSheetView style={{ flex: 1 }}>
+              {selectedShop ? (
+                <SelectedShopCard
+                  selectedShop={selectedShop}
+                  bottomSheetRef={bottomSheetRef}
+                  setSelectedShop={setSelectedShop}
+                  refetch={refetch}
                 />
-
-                <Text className="text-xl font-JakartaBold mt-5 mb-3">
-                  Your Current Location
-                </Text>
-                <View className="flex flex-row items-center bg-transparent h-[300px]">
-                  <Map setSelectedShop={setSelectedShop} />
-                </View>
-
-                <Text className="text-xl font-JakartaBold mt-5 mb-3">
-                  Your Visit History
-                </Text>
-              </>
-            }
-          />
-        ) : (
-          <View className="w-full flex justify-center items-center mt-4">
-            <Image source={images.noResult} className="w-[200px] h-[180px]" />
-          </View>
-        )}
-
-        <BottomSheet
-          ref={bottomSheetRef}
-          snapPoints={["70%", "90%"]}
-          index={-1}
-          keyboardBehavior="extend"
-        >
-          {/* padding: 20  */}
-          <BottomSheetView style={{ flex: 1 }}>
-            {selectedShop ? (
-              <SelectedShopCard
-                selectedShop={selectedShop}
-                bottomSheetRef={bottomSheetRef}
-                setSelectedShop={setSelectedShop}
-                refetch={refetch}
-              />
-            ) : (
-              <Text>No shop selected</Text>
-            )}
-          </BottomSheetView>
-        </BottomSheet>
+              ) : (
+                <Text>No shop selected</Text>
+              )}
+            </BottomSheetView>
+          </BottomSheet>
+        </ScrollView>
       </SafeAreaView>
     </GestureHandlerRootView>
   );
