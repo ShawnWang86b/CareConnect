@@ -6,21 +6,26 @@ import {
   calculateRegion,
   generateMarkersFromData,
 } from "@/lib/map";
-import { useEffect, useState } from "react";
-import { Driver, MarkerData } from "@/types/type";
+import { useEffect, useRef, useState } from "react";
+import { MarkerData, Shop } from "@/types/type";
 import { icons } from "@/constants";
 import { useFetch } from "@/lib/fetch";
 import MapViewDirections from "react-native-maps-directions";
 
-const Map = () => {
-  const { data: drivers, loading, error } = useFetch<Driver[]>("/(api)/driver");
+type MapProps = {
+  setSelectedShop: any;
+};
+
+const Map = ({ setSelectedShop }: MapProps) => {
+  const mapRef = useRef<MapView>(null);
+  const { setUserLocation, setDestinationLocation } = useLocationStore();
+  const { data: shops, loading, error } = useFetch<Shop[]>("/(api)/shop");
   const {
     userLongitude,
     userLatitude,
     destinationLongitude,
     destinationLatitude,
   } = useLocationStore();
-
   const { selectedDriver, setDrivers } = useDriverStore();
   const [markers, setMarkers] = useState<MarkerData[]>([]);
 
@@ -32,18 +37,18 @@ const Map = () => {
   });
 
   useEffect(() => {
-    if (Array.isArray(drivers)) {
+    if (Array.isArray(shops)) {
       if (!userLatitude || !userLongitude) return;
 
       const newMarkers = generateMarkersFromData({
-        data: drivers,
+        data: shops,
         userLatitude,
         userLongitude,
       });
 
       setMarkers(newMarkers);
     }
-  }, [drivers, userLatitude, userLongitude]);
+  }, [shops, userLatitude, userLongitude]);
 
   useEffect(() => {
     if (markers.length > 0 && destinationLatitude && destinationLongitude) {
@@ -58,6 +63,19 @@ const Map = () => {
       });
     }
   }, [markers, destinationLatitude, destinationLongitude]);
+
+  // UseEffect to update MapView region when location changes
+  useEffect(() => {
+    if (mapRef.current && userLatitude && userLongitude) {
+      const newRegion: any = {
+        latitude: userLatitude,
+        longitude: userLongitude,
+        latitudeDelta: 0.01, // Adjust this value for your preferred zoom level
+        longitudeDelta: 0.01,
+      };
+      mapRef.current.animateToRegion(newRegion, 1000); // Smoothly animate to new region
+    }
+  }, [userLatitude, userLongitude, destinationLatitude, destinationLongitude]);
 
   if (loading || !userLatitude || !userLongitude) {
     return (
@@ -75,13 +93,14 @@ const Map = () => {
   }
   return (
     <MapView
+      ref={mapRef}
       provider={PROVIDER_DEFAULT}
       className="w-full h-full rounded-2xl"
       tintColor="black"
       mapType="mutedStandard"
       showsPointsOfInterest={false}
       initialRegion={region}
-      // showsUserLocation={true}
+      showsUserLocation={true}
       userInterfaceStyle="light"
     >
       {markers.map((marker) => (
@@ -93,6 +112,14 @@ const Map = () => {
           }}
           title={marker.title}
           className="w-[5px] h-[5px]"
+          onPress={() => {
+            setSelectedShop(marker);
+            setDestinationLocation({
+              latitude: marker.latitude,
+              longitude: marker.longitude,
+              address: "",
+            });
+          }}
           image={
             selectedDriver === marker.id ? icons.selectedMarker : icons.marker
           }

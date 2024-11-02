@@ -1,4 +1,4 @@
-import { Driver, MarkerData } from "@/types/type";
+import { Driver, MarkerData, Shop } from "@/types/type";
 
 const directionsAPI = process.env.EXPO_PUBLIC_GOOGLE_API_KEY;
 
@@ -7,19 +7,19 @@ export const generateMarkersFromData = ({
   userLatitude,
   userLongitude,
 }: {
-  data: Driver[];
+  data: Shop[];
   userLatitude: number;
   userLongitude: number;
 }): MarkerData[] => {
-  return data.map((driver) => {
+  return data.map((shop) => {
     const latOffset = (Math.random() - 0.5) * 0.01; // Random offset between -0.005 and 0.005
     const lngOffset = (Math.random() - 0.5) * 0.01; // Random offset between -0.005 and 0.005
 
     return {
       latitude: userLatitude + latOffset,
       longitude: userLongitude + lngOffset,
-      title: `${driver.first_name} ${driver.last_name}`,
-      ...driver,
+      title: `${shop.shop_name} `,
+      ...shop,
     };
   });
 };
