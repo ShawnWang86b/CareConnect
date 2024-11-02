@@ -1,4 +1,15 @@
 import { TextInputProps, TouchableOpacityProps } from "react-native";
+declare interface Shop {
+  shop_id: number;
+  shop_name: string;
+  about: string;
+  image_url: string;
+  address: string;
+  rating: number;
+  isavailable: boolean;
+  latitude: number;
+  longitude: number;
+}
 
 declare interface Driver {
   driver_id: number;
