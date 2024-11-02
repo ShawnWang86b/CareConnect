@@ -270,11 +270,11 @@ const Medicine = () => {
     } catch {}
   };
 
-  useFocusEffect(
-    useCallback(() => {
-      refetch(); // reload data when refocus the page
-    }, [])
-  );
+  // useFocusEffect(
+  //   useCallback(() => {
+  //     refetch(); // reload data when refocus the page
+  //   }, [])
+  // );
 
   // Handle time picker visibility
   const showTimePicker = () => setTimePickerVisible(true);

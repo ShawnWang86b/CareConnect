@@ -153,26 +153,23 @@ const Home = () => {
             </View>
           )}
 
-          <BottomSheet
-            ref={bottomSheetRef}
-            snapPoints={["70%", "90%"]}
-            index={-1}
-            keyboardBehavior="extend"
-          >
-            {/* padding: 20  */}
-            <BottomSheetView style={{ flex: 1 }}>
-              {selectedShop ? (
+          {selectedShop && (
+            <BottomSheet
+              ref={bottomSheetRef}
+              snapPoints={["70%", "90%"]}
+              index={-1}
+              keyboardBehavior="extend"
+            >
+              <BottomSheetView style={{ flex: 1 }}>
                 <SelectedShopCard
                   selectedShop={selectedShop}
                   bottomSheetRef={bottomSheetRef}
                   setSelectedShop={setSelectedShop}
                   refetch={refetch}
                 />
-              ) : (
-                <Text>No shop selected</Text>
-              )}
-            </BottomSheetView>
-          </BottomSheet>
+              </BottomSheetView>
+            </BottomSheet>
+          )}
         </ScrollView>
       </SafeAreaView>
     </GestureHandlerRootView>
