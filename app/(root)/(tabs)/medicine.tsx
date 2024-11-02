@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import DateList from "@/components/DateList";
 import { Ionicons } from "@expo/vector-icons";
 import {
@@ -24,7 +24,7 @@ import { fetchAPI, useFetch } from "@/lib/fetch";
 import { useDateList } from "@/store";
 import MedicineCard from "@/components/MedicineCard";
 import { images } from "@/constants";
-import { Link } from "expo-router";
+import { Link, useFocusEffect } from "expo-router";
 import * as Notifications from "expo-notifications";
 import {
   requestNotificationPermission,
@@ -269,6 +269,12 @@ const Medicine = () => {
       setShowDropdown(false);
     } catch {}
   };
+
+  useFocusEffect(
+    useCallback(() => {
+      refetch(); // reload data when refocus the page
+    }, []),
+  );
 
   // Handle time picker visibility
   const showTimePicker = () => setTimePickerVisible(true);

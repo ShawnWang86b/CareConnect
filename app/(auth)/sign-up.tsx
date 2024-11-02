@@ -32,6 +32,7 @@ const SignUp = () => {
       await signUp.create({
         emailAddress: form.email,
         password: form.password,
+        username: form.name,
       });
 
       await signUp.prepareEmailAddressVerification({ strategy: "email_code" });

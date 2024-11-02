@@ -51,22 +51,22 @@ export default function Layout() {
       }}
     >
       <Tabs.Screen
-        name="home"
-        options={{
-          title: "Home",
-          headerShown: false,
-          tabBarIcon: ({ focused }) => (
-            <TabIcon source={icons.home} focused={focused} />
-          ),
-        }}
-      />
-      <Tabs.Screen
         name="medicine"
         options={{
           title: "Medicine",
           headerShown: false,
           tabBarIcon: ({ focused }) => (
             <TabIcon source={icons.list} focused={focused} />
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name="home"
+        options={{
+          title: "Home",
+          headerShown: false,
+          tabBarIcon: ({ focused }) => (
+            <TabIcon source={icons.map} focused={focused} />
           ),
         }}
       />

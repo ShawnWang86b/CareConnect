@@ -1,16 +1,17 @@
 import { View, Text, FlatList, ScrollView } from "react-native";
-import { Stack, useLocalSearchParams } from "expo-router";
+import { Stack } from "expo-router";
 import { useEffect, useState } from "react";
 import { neon } from "@neondatabase/serverless";
-import { format, parseJSON } from "date-fns";
+import { format } from "date-fns";
 import { data } from "@/constants";
 import MedicineCard from "@/components/MedicineCard";
+import { useUser } from "@clerk/clerk-expo";
 
 const MedicHistoryPage = () => {
-  const { id } = useLocalSearchParams();
+  const { user } = useUser();
+  const id = user?.id;
   type QueryResult = Record<string, any>[];
 
-  const currentDate = Date();
   // fetch data
   const [history, setHistory] = useState<QueryResult>();
 
@@ -19,6 +20,8 @@ const MedicHistoryPage = () => {
     const res = await sql`SELECT * FROM "my_medicine" WHERE "user_id" = ${id}`;
     console.log("test:", res);
     setHistory(res);
+    console.log("history:", history);
+    console.log("Fetch_data2", data);
   }
 
   useEffect(() => {
@@ -33,12 +36,12 @@ const MedicHistoryPage = () => {
   }, []);
 
   return (
-    <ScrollView style={{ height: "100%" }}>
+    <View style={{ height: "100%" }}>
       <Stack.Screen
         options={{ headerTitle: `My Medicines`, headerBackTitle: "Back" }}
       />
       {history && history.length > 0 ? (
-        <>
+        <ScrollView>
           <View style={{ marginTop: "5%" }}>
             <Text
               className="text-xl capitalize font-JakartaExtraBold"
@@ -49,14 +52,8 @@ const MedicHistoryPage = () => {
             <FlatList
               className="bg-white m-4 p-4"
               data={history.filter((singlerecord) => {
-                // const timeArray = singlerecord.end_date.split("-");
-                // const endDate = timeArray[2] + timeArray[0] + timeArray[1];
                 var curDate = new Date();
                 const formatDate = format(curDate, "yyyy-MM-dd");
-                // const startTimeArray = singlerecord.start_date.split("-");
-                // const startDate =
-                //   startTimeArray[2] + startTimeArray[0] + startTimeArray[1];
-
                 return (
                   formatDate <= singlerecord.end_date &&
                   formatDate >= singlerecord.start_date
@@ -72,6 +69,7 @@ const MedicHistoryPage = () => {
                 alignItems: "center",
                 paddingTop: 5,
               }}
+              scrollEnabled={false}
             />
           </View>
           <View>
@@ -84,8 +82,6 @@ const MedicHistoryPage = () => {
             <FlatList
               className="bg-white m-4 p-4"
               data={history.filter((singlerecord) => {
-                // const timeArray = singlerecord.end_date.split("-");
-                // const endDate = timeArray[2] + timeArray[0] + timeArray[1];
                 var curDate = new Date();
                 const formatDate = format(curDate, "yyyy-MM-dd");
                 return formatDate > singlerecord.end_date;
@@ -100,9 +96,10 @@ const MedicHistoryPage = () => {
                 alignItems: "center",
                 paddingTop: 5,
               }}
+              scrollEnabled={false}
             />
           </View>
-        </>
+        </ScrollView>
       ) : (
         <View className="relative">
           <Text className="z-10 absolute top-10 px-5 mt-5 text-2xl font-JakartaBold flex justify-center items-start">
@@ -110,7 +107,7 @@ const MedicHistoryPage = () => {
           </Text>
         </View>
       )}
-    </ScrollView>
+    </View>
   );
 };
 
