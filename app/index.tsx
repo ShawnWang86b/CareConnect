@@ -8,7 +8,7 @@ LogBox.ignoreAllLogs();
 const Home = () => {
   const { isSignedIn } = useAuth();
   if (isSignedIn) {
-    return <Redirect href="/(root)/(tabs)/home" />;
+    return <Redirect href="/(root)/(tabs)/medicine" />;
   }
   return <Redirect href="/(auth)/welcome" />;
 };
