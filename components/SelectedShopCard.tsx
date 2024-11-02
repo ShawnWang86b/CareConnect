@@ -11,12 +11,14 @@ interface SelectedShopCardProps {
   selectedShop: Shop;
   bottomSheetRef: React.RefObject<BottomSheet>;
   setSelectedShop: (shop: Shop | null) => void;
+  refetch: any;
 }
 
 const SelectedShopCard: React.FC<SelectedShopCardProps> = ({
   selectedShop,
   bottomSheetRef,
   setSelectedShop,
+  refetch,
 }) => {
   const { user } = useUser();
   const userId = user?.id;
@@ -31,6 +33,7 @@ const SelectedShopCard: React.FC<SelectedShopCardProps> = ({
           user_id: userId,
         }),
       });
+      refetch();
     } catch {}
   };
 

@@ -1,9 +1,9 @@
 import { useEffect, useRef, useState } from "react";
 import GoogleTextInput from "@/components/GoogleTextInput";
-import { icons } from "@/constants";
+import { icons, images } from "@/constants";
 import { useAuth, useUser } from "@clerk/clerk-expo";
 import { router } from "expo-router";
-import { Text, TouchableOpacity, View, Image } from "react-native";
+import { Text, TouchableOpacity, View, Image, FlatList } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import Map from "@/components/Map";
 import { useLocationStore } from "@/store";
@@ -13,6 +13,7 @@ import BottomSheet, { BottomSheetView } from "@gorhom/bottom-sheet";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { Shop } from "@/types/type";
 import { useFetch } from "@/lib/fetch";
+import HistoryCard from "@/components/HistoryCard";
 
 const Home = () => {
   const { setUserLocation, setDestinationLocation } = useLocationStore();
@@ -31,13 +32,13 @@ const Home = () => {
 
   // handle history fetch
   const {
-    data: historyData,
+    data,
     loading: historyLoading,
     error,
     refetch,
-  } = useFetch<any[]>(`/(api)/history/${user?.id}`);
-  console.log("data1111111history", historyData);
+  } = useFetch<any[]>(`/(api)/history/${userId}/get`);
 
+  const sortedData = data?.sort((a, b) => b.id - a.id);
   // if user not allowed the sensor to get his position, then he can input
   const handleDestinationPress = (location: {
     latitude: number;
@@ -88,32 +89,64 @@ const Home = () => {
   return (
     <GestureHandlerRootView>
       <SafeAreaView className="flex-1 px-2">
-        <View className="flex flex-row items-center justify-between my-5">
-          <Text className="text-xl capitalize font-JakartaExtraBold">
-            Welcome{", "}
-            {user?.firstName ||
-              user?.emailAddresses[0].emailAddress.split("@")[0]}
-          </Text>
-          <TouchableOpacity
-            onPress={handleSignOut}
-            className="justify-center items-center w-10 h-10 rounded-full bg-white"
-          >
-            <Image source={icons.out} className="w-4 h-4" />
-          </TouchableOpacity>
-        </View>
+        {/* <FlatList
+          data={data}
+          renderItem={({ item }) => (
+            <View>
+              <HistoryCard item={item} />
+            </View>
+          )}
+          className="mt-4"
+        /> */}
+        {sortedData && sortedData?.length > 0 ? (
+          <FlatList
+            data={sortedData}
+            renderItem={({ item }) => (
+              <View>
+                <HistoryCard item={item} />
+              </View>
+            )}
+            className="mt-4"
+            ListHeaderComponent={
+              <>
+                <View className="flex flex-row items-center justify-between my-5">
+                  <Text className="text-xl capitalize font-JakartaExtraBold">
+                    Welcome{", "}
+                    {user?.firstName ||
+                      user?.emailAddresses[0].emailAddress.split("@")[0]}
+                  </Text>
+                  <TouchableOpacity
+                    onPress={handleSignOut}
+                    className="justify-center items-center w-10 h-10 rounded-full bg-white"
+                  >
+                    <Image source={icons.out} className="w-4 h-4" />
+                  </TouchableOpacity>
+                </View>
 
-        <GoogleTextInput
-          icon={icons.search}
-          containerStyle="bg-white shadow-md shadow-neutral-300"
-          handlePress={handleDestinationPress}
-        />
+                <GoogleTextInput
+                  icon={icons.search}
+                  containerStyle="bg-white shadow-md shadow-neutral-300"
+                  handlePress={handleDestinationPress}
+                />
 
-        <Text className="text-xl font-JakartaBold mt-5 mb-3">
-          Your Current Location
-        </Text>
-        <View className="flex flex-row items-center bg-transparent h-[300px]">
-          <Map setSelectedShop={setSelectedShop} />
-        </View>
+                <Text className="text-xl font-JakartaBold mt-5 mb-3">
+                  Your Current Location
+                </Text>
+                <View className="flex flex-row items-center bg-transparent h-[300px]">
+                  <Map setSelectedShop={setSelectedShop} />
+                </View>
+
+                <Text className="text-xl font-JakartaBold mt-5 mb-3">
+                  Your Visit History
+                </Text>
+              </>
+            }
+          />
+        ) : (
+          <View className="w-full flex justify-center items-center mt-4">
+            <Image source={images.noResult} className="w-[200px] h-[180px]" />
+          </View>
+        )}
 
         <BottomSheet
           ref={bottomSheetRef}
@@ -128,6 +161,7 @@ const Home = () => {
                 selectedShop={selectedShop}
                 bottomSheetRef={bottomSheetRef}
                 setSelectedShop={setSelectedShop}
+                refetch={refetch}
               />
             ) : (
               <Text>No shop selected</Text>
