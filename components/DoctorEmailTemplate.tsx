@@ -2,8 +2,8 @@
 import React from 'react';
 
 const DoctorEmailTemplate = ({
-  doctorName = 'Smith',
-  message = "Your medical assistant's message.",
+  doctorName = 'Doctor',
+  heartRateData = 'No heart rate data available',
 }) =>
   `<html>
     <head>
@@ -19,7 +19,8 @@ const DoctorEmailTemplate = ({
     <body>
       <div class="container">
         <h1 class="heading">Hello Dr. ${doctorName},</h1>
-        <p class="message">${message}</p>
+        <p class="message">This is my recent heart rate readings: ${heartRateData}.</p>
+        <p class="message">Could you review these readings and let me know if there's anything concerning?</p>
         <p class="footer">Sent by your medical assistant.</p>
       </div>
     </body>
