@@ -4,6 +4,8 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { useFetch } from '@/lib/fetch'; // Assuming useFetch is a custom hook to fetch data
 import { Resend } from 'resend';
+import DoctorEmailTemplate from '@/components/DoctorEmailTemplate';
+import { renderToStaticMarkup } from 'react-dom/server'; // Import to convert React component to HTML
 
 // Initialize Resend
 const resend = new Resend('re_Nw6eFmeK_GSVKsnfXzv1iefFqcYc2YGt8');
@@ -33,13 +35,18 @@ const Chat = () => {
     }
 
     try {
+      // Generate the HTML string directly
+      const htmlContent = DoctorEmailTemplate({
+        doctorName: selectedDoctor.name,
+        message: 'This is a predefined message from the medical assistant.',
+      });
+
       // Send email using Resend
       await resend.emails.send({
-        from: 'onboarding@resend.dev', // Replace with your verified sender
+        from: 'onboarding@resend.dev',
         to: selectedDoctor.email,
-        subject: `Message from Medical Assistant`,
-        html: `<p>Hello Dr. ${selectedDoctor.name},</p>
-               <p>This is a predefined message from the medical assistant.</p>`,
+        subject: `Update from Your Medical Assistant`,
+        html: htmlContent,
       });
 
       Alert.alert('Success', `Email sent to Dr. ${selectedDoctor.name}`);
@@ -62,7 +69,7 @@ const Chat = () => {
             }`}
           >
             <Text className="text-2xl font-semibold text-gray-800">
-              {item.name}
+              Dr. {item.name}
             </Text>
             <View className="flex-row items-center mt-3">
               <Ionicons
