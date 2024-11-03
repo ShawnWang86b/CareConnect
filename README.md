@@ -1,5 +1,6 @@
-How to Compile and Run the App
-(1)
+# How to Compile and Run the App
+
+## (1)
 Extract the Zip file, and open it by using IDE(e.g.VSCode)
 Or
 Clone the Code from the CareConnect Repository
@@ -9,7 +10,8 @@ Open your terminal and run the following command:
 git clone https://github.com/ShawnWang86b/CareConnect.git
 Navigate to the Project Folder
 
-(2)
+
+## (2)
 After cloning the code, change to the project directory. For example:
 
 cd Desktop/CareConnect
@@ -25,14 +27,16 @@ This will automatically install all the required dependencies.
 
 Install a Simulator
 
-(3)
+
+## (3)
 To run the app on a simulator, you may need to set up one according to your system:
 
 For an Android emulator: Follow these instructions. https://docs.expo.dev/workflow/android-studio-emulator/
 For an iOS simulator: Follow these instructions. https://docs.expo.dev/workflow/ios-simulator/
 Start the Development Server
 
-(4)
+
+## (4)
 After completing the setup, start the project by running:
 
 npm run start
@@ -48,6 +52,8 @@ Type a to open the app in the Android emulator.
 And you can scan the QR code by using Android phone, to run react native project in an Expo app, in Android or iOS phone.
 
 We suggest to type a to open the app in the Android emulator.
+
+
 
 
 Email feature:
