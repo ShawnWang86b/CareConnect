@@ -2,8 +2,10 @@
 
 (1)
 Extract the Zip file, and open it by using IDE(e.g.VSCode) (Recommended)
+
 Or
-Clone the Code from the CareConnect Repository
+
+Clone the Code from the CareConnect Repository.
 Open your terminal and run the following command:
 
 git clone https://github.com/ShawnWang86b/CareConnect.git
@@ -55,7 +57,7 @@ And you can scan the QR code by using Android phone, to run react native project
 We suggest to type 'a' to open the app in the Android emulator.
 
 
-## Tips
+## Test
 Email feature:
 Since our approach with the email feature (Resend) requires an existing domain to allow specific users to receive an email, and could cost at least 20 AUD per year, the current implementation only allows our testing account to receive emails. Therefore, to test whether users' heartrate data has been sent successfully, we provide this account for verification.
 
