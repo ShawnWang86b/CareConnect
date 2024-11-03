@@ -191,7 +191,7 @@ const SignUp = () => {
               title="Browse Home"
               onPress={() => {
                 setShowSuccessModal(false);
-                router.push("/(root)/(tabs)/medicine");
+                router.push("/(root)/(tabs)/home");
               }}
             />
           </View>

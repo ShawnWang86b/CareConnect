@@ -23,7 +23,7 @@ const SignIn = () => {
 
       if (signInAttempt.status === "complete") {
         await setActive({ session: signInAttempt.createdSessionId });
-        router.replace("/(root)/(tabs)/medicine");
+        router.replace("/(root)/(tabs)/home");
       } else {
         // See https://clerk.com/docs/custom-flows/error-handling
         // for more info on error handling

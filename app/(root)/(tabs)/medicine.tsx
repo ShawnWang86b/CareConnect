@@ -125,7 +125,7 @@ const Medicine = () => {
     }
     const results = medicines
       .filter((medicine) =>
-        medicine.name.toLowerCase().includes(input.toLowerCase())
+        medicine.name.toLowerCase().includes(input.toLowerCase()),
       )
       .sort((a, b) => a.name.localeCompare(b.name)); // Sort results alphabetically
     setFilteredMedicines(results);
@@ -140,7 +140,7 @@ const Medicine = () => {
 
   // fetch data
   const { data, loading, error, refetch } = useFetch<any[]>(
-    `/(api)/(myMedicine)/${userId}/${userSelectedDate}`
+    `/(api)/(myMedicine)/${userId}/${userSelectedDate}`,
   );
   console.log("Fetch_data", data);
 
@@ -185,7 +185,7 @@ const Medicine = () => {
   // Remove selected time
   const removeTime = (index: number) => {
     const updatedTimes = selectedTimes.filter(
-      (_, timeIndex) => timeIndex !== index
+      (_, timeIndex) => timeIndex !== index,
     );
     setSelectedTimes(updatedTimes);
     //@ts-ignore
@@ -227,7 +227,7 @@ const Medicine = () => {
     // the generated date range
     const dateRange = generateDateRange(
       new Date(start_date),
-      new Date(end_date)
+      new Date(end_date),
     );
 
     // combine all dates and all times
@@ -263,18 +263,18 @@ const Medicine = () => {
       handleScheduleNotification(datesTimes);
       Alert.alert(
         "Reminders Set!",
-        "You will receive notifications for your selected time(s)."
+        "You will receive notifications for your selected time(s).",
       );
       clearInput();
       setShowDropdown(false);
     } catch {}
   };
 
-  // useFocusEffect(
-  //   useCallback(() => {
-  //     refetch(); // reload data when refocus the page
-  //   }, [])
-  // );
+  useFocusEffect(
+    useCallback(() => {
+      refetch(); // reload data when refocus the page
+    }, []),
+  );
 
   // Handle time picker visibility
   const showTimePicker = () => setTimePickerVisible(true);
