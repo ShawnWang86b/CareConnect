@@ -6,7 +6,7 @@ import { useFetch } from '@/lib/fetch'; // Assuming useFetch is a custom hook to
 import { Resend } from 'resend';
 
 // Initialize Resend
-const resend = new Resend('re_Nw6eFmeK_GSVKsnfXzv1iefFqcYc2YGt8');
+const resend = new Resend(process.env.RESEND_API_KEY);
 
 type Doctor = {
   id: number;
@@ -109,7 +109,7 @@ const Chat = () => {
             className="mx-5 my-4 mb-6 py-4 bg-indigo-600 rounded-lg shadow-lg"
           >
             <Text className="text-center text-white text-xl font-semibold">
-              Send Message
+              Start Chat
             </Text>
           </TouchableOpacity>
         }
