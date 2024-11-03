@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { View, Text, FlatList, TouchableOpacity, Alert } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
@@ -6,7 +6,7 @@ import { useFetch } from "@/lib/fetch"; // Assuming useFetch is a custom hook to
 import { Resend } from "resend";
 import DoctorEmailTemplate from "@/components/DoctorEmailTemplate";
 import { renderToStaticMarkup } from "react-dom/server"; // Import to convert React component to HTML
-import { Stack } from "expo-router";
+import { Stack, useLocalSearchParams } from "expo-router";
 
 // Initialize Resend
 const resend = new Resend("re_Nw6eFmeK_GSVKsnfXzv1iefFqcYc2YGt8");
@@ -27,7 +27,21 @@ const Email = () => {
     loading,
     error,
   } = useFetch<Doctor[]>("/(api)/(chat)/get");
-
+  const { array } = useLocalSearchParams<{ array: string }>();
+  const [heartRate, setHeartRate] = useState(null);
+  useEffect(() => {
+    if (array != "0") {
+      parseHeartRate();
+    }
+  }, []);
+  async function parseHeartRate() {
+    const parsedJson = await JSON.parse(array);
+    console.log("json", parsedJson);
+    setHeartRate(parsedJson);
+  }
+  useEffect(() => {
+    console.log("heartRate", heartRate);
+  }, [heartRate]);
   // Function to send email
   const sendEmail = async () => {
     if (!selectedDoctor) {

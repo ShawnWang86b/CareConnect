@@ -23,7 +23,7 @@ import {
 } from "react-native";
 import { SafeAreaView, useSafeAreaFrame } from "react-native-safe-area-context";
 import { CountdownCircleTimer } from "react-native-countdown-circle-timer";
-import { Stack } from "expo-router";
+import { Stack, router } from "expo-router";
 import { LineChart } from "react-native-chart-kit";
 import { LineChartData } from "react-native-chart-kit/dist/line-chart/LineChart";
 import AntDesign from "@expo/vector-icons/AntDesign";
@@ -75,9 +75,20 @@ export default function Heartrate() {
     setCountdownStart(true);
   }
   function CountDownUpdate(remainingTime: number) {
+    if (remainingTime == 10) {
+      return;
+    }
     var tmp = heartArray;
-    tmp[remainingTime] = Math.random() * (90 - 70) + 70;
-    setHeartArray(tmp);
+    if (10 - remainingTime < 10) {
+      tmp[10 - remainingTime] = Math.random() * (90 - 70) + 70;
+      setHeartArray(tmp);
+    }
+  }
+  function handleSendHeartrate() {
+    const paramData = { data: heartArray };
+    const paramString = JSON.stringify(paramData);
+    console.log(paramString);
+    router.replace(`/(root)/email/${paramString}`);
   }
   return (
     <SafeAreaView style={styles.container}>
@@ -150,6 +161,12 @@ export default function Heartrate() {
           borderRadius: 16,
         }}
       />
+      {!countdownStart && (
+        <Button
+          onPress={handleSendHeartrate}
+          title="Send heart rate to Doctors"
+        />
+      )}
     </SafeAreaView>
   );
 }

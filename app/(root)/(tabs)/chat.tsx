@@ -30,7 +30,7 @@ const Chat = () => {
         </TouchableOpacity>
 
         <TouchableOpacity
-          onPress={() => router.push("/(root)/email")}
+          onPress={() => router.push("/(root)/email/0")}
           className="flex-col justify-center items-center p-4 bg-blue-500 rounded"
           style={{ width: 150 }}
         >
