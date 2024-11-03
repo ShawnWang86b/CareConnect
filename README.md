@@ -1,50 +1,59 @@
-# Welcome to your Expo app 👋
+How to Compile and Run the App
+(1)
+Extract the Zip file, and open it by using IDE(e.g.VSCode)
+Or
+Clone the Code from the CareConnect Repository
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+Open your terminal and run the following command:
 
-## Get started
+git clone https://github.com/ShawnWang86b/CareConnect.git
+Navigate to the Project Folder
 
-1. Install dependencies
+(2)
+After cloning the code, change to the project directory. For example:
 
-   ```bash
-   npm install
-   ```
+cd Desktop/CareConnect
+(Replace Desktop/CareConnect with the path to your project folder.)
 
-2. Start the app
+Install Dependencies
 
-   ```bash
-    npx expo start
-   ```
+In the project folder, run:
 
-In the output, you'll find options to open the app in a
+npm install
 
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
+This will automatically install all the required dependencies.
 
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
+Install a Simulator
 
-## Get a fresh project
+(3)
+To run the app on a simulator, you may need to set up one according to your system:
 
-When you're ready, run:
+For an Android emulator: Follow these instructions. https://docs.expo.dev/workflow/android-studio-emulator/
+For an iOS simulator: Follow these instructions. https://docs.expo.dev/workflow/ios-simulator/
+Start the Development Server
 
-```bash
-npm run reset-project
-```
+(4)
+After completing the setup, start the project by running:
 
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
+npm run start
+Or
+npm run start -c 
+Open the App on a Simulator
 
-## Learn more
+Once the development server is running, you'll see a QR code in the terminal. You can:
 
-To learn more about developing your project with Expo, look at the following resources:
+Type i to open the app in the iOS simulator.
+Type a to open the app in the Android emulator.
 
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
+And you can scan the QR code by using Android phone, to run react native project in an Expo app, in Android or iOS phone.
 
-## Join the community
+We suggest to type a to open the app in the Android emulator.
 
-Join our community of developers creating universal apps.
 
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+Email feature:
+Since our approach with the email feature (Resend) requires an existing domain to allow specific users to receive an email, and could cost at least 20 AUD per year, the current implementation only allows our testing account to receive emails. Therefore, to test whether users' heartrate data has been sent successfully, we provide this account for verification.
+
+Email: careconnect90018@gmail.com
+Password: COMP90018
+
+Once users click on the "Send Heart Rate Report" button, the account should receive a measured heartrate array formatted in a template.
