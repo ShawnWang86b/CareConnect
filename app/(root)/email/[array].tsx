@@ -1,15 +1,14 @@
-import React, { useEffect, useState } from "react";
-import { View, Text, FlatList, TouchableOpacity, Alert } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
-import { Ionicons } from "@expo/vector-icons";
-import { useFetch } from "@/lib/fetch"; // Assuming useFetch is a custom hook to fetch data
-import { Resend } from "resend";
-import DoctorEmailTemplate from "@/components/DoctorEmailTemplate";
-import { renderToStaticMarkup } from "react-dom/server"; // Import to convert React component to HTML
-import { Stack, useLocalSearchParams } from "expo-router";
+import React, { useEffect, useState } from 'react';
+import { View, Text, FlatList, TouchableOpacity, Alert } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { Ionicons } from '@expo/vector-icons';
+import { useFetch } from '@/lib/fetch';
+import { Resend } from 'resend';
+import DoctorEmailTemplate from '@/components/DoctorEmailTemplate';
+import { renderToStaticMarkup } from 'react-dom/server';
+import { Stack, useLocalSearchParams } from 'expo-router';
 
-// Initialize Resend
-const resend = new Resend("re_Nw6eFmeK_GSVKsnfXzv1iefFqcYc2YGt8");
+const resend = new Resend('re_Nw6eFmeK_GSVKsnfXzv1iefFqcYc2YGt8');
 
 type Doctor = {
   id: number;
@@ -26,55 +25,49 @@ const Email = () => {
     data: doctors,
     loading,
     error,
-  } = useFetch<Doctor[]>("/(api)/(chat)/get");
+  } = useFetch<Doctor[]>('/(api)/(chat)/get');
   const { array } = useLocalSearchParams<{ array: string }>();
-  const [heartRate, setHeartRate] = useState(null);
+  const [heartRate, setHeartRate] = useState<number[] | null>(null);
+
   useEffect(() => {
-    if (array != "0") {
-      parseHeartRate();
+    if (array && array !== '0') {
+      const parsedArray = JSON.parse(array);
+      setHeartRate(parsedArray?.data || null);
     }
-  }, []);
-  async function parseHeartRate() {
-    const parsedJson = await JSON.parse(array);
-    console.log("json", parsedJson);
-    setHeartRate(parsedJson);
-  }
-  useEffect(() => {
-    console.log("heartRate", heartRate);
-  }, [heartRate]);
-  // Function to send email
+  }, [array]);
+
   const sendEmail = async () => {
     if (!selectedDoctor) {
-      Alert.alert("No Doctor Selected", "Please select a doctor first.");
+      Alert.alert('No Doctor Selected', 'Please select a doctor first.');
       return;
     }
 
     try {
-      // Generate the HTML string directly
+      // Use the template and heart rate data for the message
       const htmlContent = DoctorEmailTemplate({
         doctorName: selectedDoctor.name,
-        message: "This is a predefined message from the medical assistant.",
+        heartRateData: heartRate?.join(', ') || 'No heart rate data available.',
       });
 
       // Send email using Resend
       await resend.emails.send({
-        from: "onboarding@resend.dev",
+        from: 'onboarding@resend.dev',
         to: selectedDoctor.email,
-        subject: `Update from Your Medical Assistant`,
+        subject: `Heart Rate Report from Your Medical Assistant`,
         html: htmlContent,
       });
 
-      Alert.alert("Success", `Email sent to Dr. ${selectedDoctor.name}`);
+      Alert.alert('Success', `Email sent to Dr. ${selectedDoctor.name}`);
     } catch (err) {
-      console.error("Error sending email:", err);
-      Alert.alert("Error", "Failed to send email. Please try again later.");
+      console.error('Error sending email:', err);
+      Alert.alert('Error', 'Failed to send email. Please try again later.');
     }
   };
 
   return (
     <SafeAreaView className="bg-gray-50">
       <Stack.Screen
-        options={{ headerTitle: `Email to Doctor`, headerBackTitle: "Back" }}
+        options={{ headerTitle: `Email to Doctor`, headerBackTitle: 'Back' }}
       />
       <FlatList
         data={doctors}
@@ -82,9 +75,7 @@ const Email = () => {
         renderItem={({ item }) => (
           <TouchableOpacity
             onPress={() => setSelectedDoctor(item)}
-            className={`m-4 p-3 rounded-lg shadow-md bg-white ${
-              selectedDoctor?.id === item.id ? "border-indigo-500 border-2" : ""
-            }`}
+            className={`m-4 p-3 rounded-lg shadow-md bg-white ${selectedDoctor?.id === item.id ? 'border-indigo-500 border-2' : ''}`}
           >
             <Text className="text-2xl font-semibold text-gray-800">
               Dr. {item.name}
@@ -141,10 +132,10 @@ const Email = () => {
         ListEmptyComponent={
           <Text className="text-center mt-4 text-lg text-gray-600">
             {loading
-              ? "Loading..."
+              ? 'Loading...'
               : error
                 ? `Error: ${error}`
-                : "No doctors available"}
+                : 'No doctors available'}
           </Text>
         }
         contentContainerStyle={{ paddingBottom: 100 }}
