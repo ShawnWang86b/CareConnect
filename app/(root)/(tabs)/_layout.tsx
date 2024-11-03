@@ -66,7 +66,7 @@ export default function Layout() {
           title: "Home",
           headerShown: false,
           tabBarIcon: ({ focused }) => (
-            <TabIcon source={icons.map} focused={focused} />
+            <TabIcon source={icons.point} focused={focused} />
           ),
         }}
       />
