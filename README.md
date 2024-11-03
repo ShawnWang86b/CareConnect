@@ -1,6 +1,6 @@
-# How to Compile and Run the App
+## How to Compile and Run the App
 
-## (1)
+(1)
 Extract the Zip file, and open it by using IDE(e.g.VSCode)
 Or
 Clone the Code from the CareConnect Repository
@@ -8,10 +8,11 @@ Clone the Code from the CareConnect Repository
 Open your terminal and run the following command:
 
 git clone https://github.com/ShawnWang86b/CareConnect.git
-Navigate to the Project Folder
 
 
-## (2)
+## Navigate to the Project Folder
+
+(2)
 After cloning the code, change to the project directory. For example:
 
 cd Desktop/CareConnect
@@ -25,18 +26,17 @@ npm install
 
 This will automatically install all the required dependencies.
 
-Install a Simulator
+## Install a Simulator
 
-
-## (3)
+(3)
 To run the app on a simulator, you may need to set up one according to your system:
 
 For an Android emulator: Follow these instructions. https://docs.expo.dev/workflow/android-studio-emulator/
 For an iOS simulator: Follow these instructions. https://docs.expo.dev/workflow/ios-simulator/
-Start the Development Server
 
+## start the Development Server
 
-## (4)
+(4)
 After completing the setup, start the project by running:
 
 npm run start
